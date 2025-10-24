@@ -1,5 +1,7 @@
 # PDF Bridge
 
+![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
+
 Әртүрлі форматтарды PDF-ке түрлендіру үшін бірнеше конвертерді (TCPDF, mPDF, LibreOffice) пайдаланатын әмбебап Laravel пакеті.
 
 ## Мүмкіндіктер
