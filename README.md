@@ -1,20 +1,22 @@
 # PHP PDF Bridge
 
-![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
+![PDF Bridge Cover](https://i.ibb.co/kVNWgkBx/madarlan-pdf-bridge-php.png)
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![PHP Version Require](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 
-A powerful and universal PHP/Laravel package for converting various document formats to PDF using multiple converters (TCPDF, mPDF, LibreOffice). Features robust validation, comprehensive logging, and support for 15+ file formats with Laravel 8-12 support.
+A powerful and universal PHP/Laravel package for converting various document formats to PDF using multiple converters (
+TCPDF, mPDF, LibreOffice). Features robust validation, comprehensive logging, and support for 15+ file formats with
+Laravel 8-12 support.
 
 ## Description
 
 PHP PDF Bridge provides a unified interface for document conversion to PDF using several powerful libraries:
 
-- **TCPDF** - for text, HTML and CSV conversion
-- **mPDF** - for advanced HTML and CSS processing
-- **LibreOffice** (via ncjoes/office-converter) - for DOC/DOCX/XLS/XLSX conversion
+- **[TCPDF](https://github.com/tecnickcom/TCPDF)** - for text, HTML and CSV conversion
+- **[mPDF](https://github.com/mpdf/mpdf)** - for advanced HTML and CSS processing
+- **LibreOffice** (via [ncjoes/office-converter](https://github.com/ncjoes/office-converter)) - for DOC/DOCX/XLS/XLSX conversion
 
 ## Supported Formats
 
@@ -442,6 +444,373 @@ $converters = $pdfBridge->getAvailableConverters();
 print_r($converters);
 ```
 
+## 📚 Detailed Usage Examples
+
+### Basic Conversions
+
+#### Text to PDF
+
+```php
+use MadArlan\PDFBridge\PDFBridge;
+
+$pdfBridge = new PDFBridge();
+
+// Simple text conversion
+$text = "Hello World!\nThis is a multi-line text document.";
+$pdfPath = $pdfBridge->convertText($text, 'hello.pdf');
+
+// Return PDF as string (for download)
+$pdfContent = $pdfBridge->convertText($text);
+return response($pdfContent, 200, [
+    'Content-Type' => 'application/pdf',
+    'Content-Disposition' => 'attachment; filename="document.pdf"'
+]);
+```
+
+#### HTML to PDF with Advanced Styling
+
+```php
+// Complex HTML with CSS
+$html = '
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { background-color: #f0f0f0; padding: 20px; }
+        .content { margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Company Report</h1>
+    </div>
+    <div class="content">
+        <table>
+            <tr><th>Product</th><th>Price</th></tr>
+            <tr><td>Widget A</td><td>$10.00</td></tr>
+            <tr><td>Widget B</td><td>$15.00</td></tr>
+        </table>
+    </div>
+</body>
+</html>';
+
+$pdfBridge->convertHTML($html, 'report.pdf');
+```
+
+#### CSV to PDF with Custom Options
+
+```php
+// CSV data
+$csvData = "Name,Age,City,Salary\n";
+$csvData .= "John Doe,30,New York,$50000\n";
+$csvData .= "Jane Smith,25,Los Angeles,$45000\n";
+$csvData .= "Bob Johnson,35,Chicago,$55000\n";
+
+// Convert with custom options
+$options = [
+    'csv_delimiter' => ',',
+    'csv_has_header' => true,
+    'font_size' => 10
+];
+
+$pdfBridge->convertCSV($csvData, 'employees.pdf', $options);
+```
+
+#### Office Documents to PDF
+
+```php
+// Microsoft Word Documents
+$pdfBridge->convertFile('contract.doc', 'contract.pdf');
+$pdfBridge->convertFile('report.docx', 'report.pdf');
+
+// Microsoft Excel Spreadsheets
+$pdfBridge->convertFile('budget.xls', 'budget.pdf');
+$pdfBridge->convertFile('data.xlsx', 'data.pdf');
+
+// Microsoft PowerPoint Presentations
+$pdfBridge->convertFile('presentation.ppt', 'presentation.pdf');
+$pdfBridge->convertFile('slides.pptx', 'slides.pdf');
+
+// OpenOffice/LibreOffice Documents
+$pdfBridge->convertFile('document.odt', 'document.pdf');     // Writer
+$pdfBridge->convertFile('spreadsheet.ods', 'spreadsheet.pdf'); // Calc
+$pdfBridge->convertFile('presentation.odp', 'presentation.pdf'); // Impress
+
+// Rich Text Format
+$pdfBridge->convertFile('document.rtf', 'document.pdf');
+
+// With custom options for Office documents
+$options = [
+    'converter' => 'libreoffice',
+    'timeout' => 300,           // 5 minutes for large documents
+    'temp_dir' => '/tmp/pdf',   // Custom temporary directory
+    'format' => 'A4',
+    'orientation' => 'P'
+];
+
+$pdfBridge->convertFile('large-document.docx', 'output.pdf', $options);
+```
+
+#### Batch Office Document Processing
+
+```php
+// Process multiple Office documents
+$officeFiles = [
+    'documents/contract.docx',
+    'documents/budget.xlsx', 
+    'documents/presentation.pptx',
+    'documents/report.odt',
+    'documents/data.ods'
+];
+
+foreach ($officeFiles as $file) {
+    try {
+        $outputFile = pathinfo($file, PATHINFO_FILENAME) . '.pdf';
+        $outputPath = 'converted/' . $outputFile;
+        
+        echo "Converting {$file}...\n";
+        $pdfBridge->convertFile($file, $outputPath);
+        echo "✓ Converted to {$outputPath}\n";
+        
+    } catch (\Exception $e) {
+        echo "✗ Failed to convert {$file}: " . $e->getMessage() . "\n";
+    }
+}
+```
+
+#### Advanced Office Document Conversion
+
+```php
+// Convert with specific LibreOffice settings
+$config = [
+    'default' => 'libreoffice',
+    'libreoffice' => [
+        'libreoffice_path' => '/usr/bin/libreoffice',
+        'temp_dir' => storage_path('app/temp'),
+        'timeout' => 600,  // 10 minutes for very large files
+        'format' => 'pdf',
+        'options' => [
+            '--headless',
+            '--invisible',
+            '--nodefault',
+            '--nolockcheck'
+        ]
+    ]
+];
+
+$pdfBridge = new PDFBridge($config);
+
+// Convert complex documents with formatting preservation
+$complexDocs = [
+    'financial-report.docx' => ['format' => 'A4', 'orientation' => 'P'],
+    'wide-spreadsheet.xlsx' => ['format' => 'A3', 'orientation' => 'L'],
+    'presentation.pptx' => ['format' => 'A4', 'orientation' => 'L']
+];
+
+foreach ($complexDocs as $file => $settings) {
+    $pdfBridge->convertFile($file, str_replace(pathinfo($file, PATHINFO_EXTENSION), 'pdf', $file), $settings);
+}
+```
+
+#### Error Handling for Office Documents
+
+```php
+use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
+use MadArlan\PDFBridge\Exceptions\ConversionException;
+
+try {
+    $pdfBridge->convertFile('document.docx', 'output.pdf');
+    
+} catch (ConverterNotAvailableException $e) {
+    // LibreOffice not installed or not found
+    echo "LibreOffice is required for Office document conversion.\n";
+    echo "Error: " . $e->getMessage() . "\n";
+    echo "Please install LibreOffice or check the installation path.\n";
+    
+} catch (ConversionException $e) {
+    // Conversion failed (corrupted file, unsupported features, etc.)
+    echo "Document conversion failed: " . $e->getMessage() . "\n";
+    
+    // Check if file exists and is readable
+    if (!file_exists('document.docx')) {
+        echo "File does not exist.\n";
+    } elseif (!is_readable('document.docx')) {
+        echo "File is not readable.\n";
+    } else {
+        echo "File may be corrupted or contain unsupported features.\n";
+    }
+}
+```
+
+### Advanced Configuration
+
+#### Custom Converter Settings
+
+```php
+$config = [
+    'default' => 'mpdf',
+    'mpdf' => [
+        'format' => 'A4',
+        'orientation' => 'L', // Landscape
+        'margin_left' => 20,
+        'margin_right' => 20,
+        'margin_top' => 25,
+        'margin_bottom' => 25,
+        'default_font' => 'Arial',
+        'default_font_size' => 12
+    ],
+    'tcpdf' => [
+        'format' => 'A3',
+        'orientation' => 'P', // Portrait
+        'font' => [
+            'family' => 'helvetica',
+            'size' => 14
+        ]
+    ]
+];
+
+$pdfBridge = new PDFBridge($config);
+```
+
+#### With Custom Logger
+
+```php
+use Psr\Log\LoggerInterface;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+// Create custom logger
+$logger = new Logger('pdf-bridge');
+$logger->pushHandler(new StreamHandler('pdf-conversions.log', Logger::INFO));
+
+$pdfBridge = new PDFBridge($config, $logger);
+
+// All operations will be logged to pdf-conversions.log
+$pdfBridge->convertText('Hello World!', 'output.pdf');
+```
+
+### Real-World Laravel Examples
+
+#### E-commerce Invoice Generation
+
+```php
+class InvoiceService
+{
+    public function __construct(private PDFBridge $pdfBridge)
+    {
+    }
+    
+    public function generateInvoice(Order $order): string
+    {
+        $html = view('invoices.template', [
+            'order' => $order,
+            'customer' => $order->customer,
+            'items' => $order->items,
+            'total' => $order->total
+        ])->render();
+        
+        $filename = "invoice-{$order->id}.pdf";
+        $path = storage_path("app/invoices/{$filename}");
+        
+        try {
+            $this->pdfBridge->convertHTML($html, $path, [
+                'format' => 'A4',
+                'orientation' => 'P',
+                'margin_left' => 15,
+                'margin_right' => 15
+            ]);
+            
+            return $path;
+            
+        } catch (ConversionException $e) {
+            Log::error('Invoice generation failed', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            throw new \Exception('Failed to generate invoice PDF');
+        }
+    }
+}
+```
+
+#### Queue Jobs for Large Documents
+
+```php
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use MadArlan\PDFBridge\PDFBridge;
+
+class GeneratePDFJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, SerializesModels;
+    
+    public function __construct(
+        private string $htmlContent,
+        private string $outputPath
+    ) {}
+    
+    public function handle(PDFBridge $pdfBridge): void
+    {
+        $pdfBridge->convertHTML($this->htmlContent, $this->outputPath);
+        
+        // Notify user or perform additional actions
+    }
+}
+
+// Dispatch the job
+GeneratePDFJob::dispatch($htmlContent, $outputPath);
+```
+
+#### Bulk Document Processing
+
+```php
+class DocumentProcessor
+{
+    public function __construct(private PDFBridge $pdfBridge)
+    {
+    }
+    
+    public function processBatch(array $files): array
+    {
+        $results = [];
+        
+        foreach ($files as $file) {
+            try {
+                $outputPath = $this->getOutputPath($file);
+                $this->pdfBridge->convertFile($file, $outputPath);
+                
+                $results[] = [
+                    'file' => $file,
+                    'status' => 'success',
+                    'output' => $outputPath
+                ];
+                
+            } catch (\Exception $e) {
+                $results[] = [
+                    'file' => $file,
+                    'status' => 'error',
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+        
+        return $results;
+    }
+    
+    private function getOutputPath(string $inputFile): string
+    {
+        $pathInfo = pathinfo($inputFile);
+        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.pdf';
+    }
+}
+```
+
 ## Error Handling
 
 ```php
@@ -632,4 +1001,5 @@ If you encounter problems or have questions:
 
 - **Author**: [MadArlan](https://github.com/madarlan)
 - **Contributors**: [All Contributors](https://github.com/madarlan/pdf-bridge-php/contributors)
-- **Powered by**: [TCPDF](https://tcpdf.org/), [mPDF](https://mpdf.github.io/), [LibreOffice](https://www.libreoffice.org/)
+- **Powered by
+  **: [TCPDF](https://tcpdf.org/), [mPDF](https://mpdf.github.io/), [LibreOffice](https://www.libreoffice.org/)

@@ -1,6 +1,6 @@
 # PHP PDF Bridge
 
-![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
+![PDF Bridge Cover](https://i.ibb.co/kVNWgkBx/madarlan-pdf-bridge-php.png)
 
 [![Последняя версия](https://img.shields.io/packagist/v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 [![Стиль кода](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=стиль%20кода&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
@@ -14,9 +14,9 @@
 
 PHP PDF Bridge предоставляет единый интерфейс для конвертации документов в PDF, используя несколько мощных библиотек:
 
-- **TCPDF** - для конвертации текста, HTML и CSV
-- **mPDF** - для расширенной работы с HTML и CSS
-- **LibreOffice** (через ncjoes/office-converter) - для конвертации DOC/DOCX/XLS/XLSX
+- **[TCPDF](https://github.com/tecnickcom/TCPDF)** - для конвертации текста, HTML и CSV
+- **[mPDF](https://github.com/mpdf/mpdf)** - для расширенной работы с HTML и CSS
+- **LibreOffice** (через [ncjoes/office-converter](https://github.com/ncjoes/office-converter)) - для конвертации DOC/DOCX/XLS/XLSX
 
 ## Поддерживаемые форматы
 
@@ -633,6 +633,373 @@ if (!empty($diagnosis['errors'])) {
     echo "Ошибки:\n";
     foreach ($diagnosis['errors'] as $error) {
         echo "  - {$error}\n";
+    }
+}
+```
+
+## 📚 Подробные примеры использования
+
+### Базовые конверсии
+
+#### Текст в PDF
+
+```php
+use MadArlan\PDFBridge\PDFBridge;
+
+$pdfBridge = new PDFBridge();
+
+// Простая конверсия текста
+$text = "Привет, мир!\nЭто многострочный текстовый документ.";
+$pdfPath = $pdfBridge->convertText($text, 'hello.pdf');
+
+// Возврат PDF как строки (для скачивания)
+$pdfContent = $pdfBridge->convertText($text);
+return response($pdfContent, 200, [
+    'Content-Type' => 'application/pdf',
+    'Content-Disposition' => 'attachment; filename="document.pdf"'
+]);
+```
+
+#### HTML в PDF с продвинутой стилизацией
+
+```php
+// Сложный HTML с CSS
+$html = '
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { background-color: #f0f0f0; padding: 20px; }
+        .content { margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Отчет компании</h1>
+    </div>
+    <div class="content">
+        <table>
+            <tr><th>Товар</th><th>Цена</th></tr>
+            <tr><td>Виджет А</td><td>1000 руб.</td></tr>
+            <tr><td>Виджет Б</td><td>1500 руб.</td></tr>
+        </table>
+    </div>
+</body>
+</html>';
+
+$pdfBridge->convertHTML($html, 'report.pdf');
+```
+
+#### CSV в PDF с настройками
+
+```php
+// CSV данные
+$csvData = "Имя,Возраст,Город,Зарплата\n";
+$csvData .= "Иван Иванов,30,Москва,50000\n";
+$csvData .= "Мария Петрова,25,СПб,45000\n";
+$csvData .= "Петр Сидоров,35,Казань,55000\n";
+
+// Конверсия с настройками
+$options = [
+    'csv_delimiter' => ',',
+    'csv_has_header' => true,
+    'font_size' => 10
+];
+
+$pdfBridge->convertCSV($csvData, 'employees.pdf', $options);
+```
+
+#### Office документы в PDF
+
+```php
+// Документы Microsoft Word
+$pdfBridge->convertFile('договор.doc', 'договор.pdf');
+$pdfBridge->convertFile('отчет.docx', 'отчет.pdf');
+
+// Таблицы Microsoft Excel
+$pdfBridge->convertFile('бюджет.xls', 'бюджет.pdf');
+$pdfBridge->convertFile('данные.xlsx', 'данные.pdf');
+
+// Презентации Microsoft PowerPoint
+$pdfBridge->convertFile('презентация.ppt', 'презентация.pdf');
+$pdfBridge->convertFile('слайды.pptx', 'слайды.pdf');
+
+// Документы OpenOffice/LibreOffice
+$pdfBridge->convertFile('документ.odt', 'документ.pdf');     // Writer
+$pdfBridge->convertFile('таблица.ods', 'таблица.pdf');       // Calc
+$pdfBridge->convertFile('презентация.odp', 'презентация.pdf'); // Impress
+
+// Rich Text Format
+$pdfBridge->convertFile('документ.rtf', 'документ.pdf');
+
+// С настройками для Office документов
+$options = [
+    'converter' => 'libreoffice',
+    'timeout' => 300,           // 5 минут для больших документов
+    'temp_dir' => '/tmp/pdf',   // Пользовательская временная папка
+    'format' => 'A4',
+    'orientation' => 'P'
+];
+
+$pdfBridge->convertFile('большой-документ.docx', 'результат.pdf', $options);
+```
+
+#### Массовая обработка Office документов
+
+```php
+// Обработка нескольких Office документов
+$officeFiles = [
+    'документы/договор.docx',
+    'документы/бюджет.xlsx', 
+    'документы/презентация.pptx',
+    'документы/отчет.odt',
+    'документы/данные.ods'
+];
+
+foreach ($officeFiles as $file) {
+    try {
+        $outputFile = pathinfo($file, PATHINFO_FILENAME) . '.pdf';
+        $outputPath = 'конвертированные/' . $outputFile;
+        
+        echo "Конвертация {$file}...\n";
+        $pdfBridge->convertFile($file, $outputPath);
+        echo "✓ Конвертировано в {$outputPath}\n";
+        
+    } catch (\Exception $e) {
+        echo "✗ Не удалось конвертировать {$file}: " . $e->getMessage() . "\n";
+    }
+}
+```
+
+#### Продвинутая конвертация Office документов
+
+```php
+// Конвертация с специальными настройками LibreOffice
+$config = [
+    'default' => 'libreoffice',
+    'libreoffice' => [
+        'libreoffice_path' => '/usr/bin/libreoffice',
+        'temp_dir' => storage_path('app/temp'),
+        'timeout' => 600,  // 10 минут для очень больших файлов
+        'format' => 'pdf',
+        'options' => [
+            '--headless',
+            '--invisible',
+            '--nodefault',
+            '--nolockcheck'
+        ]
+    ]
+];
+
+$pdfBridge = new PDFBridge($config);
+
+// Конвертация сложных документов с сохранением форматирования
+$complexDocs = [
+    'финансовый-отчет.docx' => ['format' => 'A4', 'orientation' => 'P'],
+    'широкая-таблица.xlsx' => ['format' => 'A3', 'orientation' => 'L'],
+    'презентация.pptx' => ['format' => 'A4', 'orientation' => 'L']
+];
+
+foreach ($complexDocs as $file => $settings) {
+    $pdfBridge->convertFile($file, str_replace(pathinfo($file, PATHINFO_EXTENSION), 'pdf', $file), $settings);
+}
+```
+
+#### Обработка ошибок для Office документов
+
+```php
+use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
+use MadArlan\PDFBridge\Exceptions\ConversionException;
+
+try {
+    $pdfBridge->convertFile('документ.docx', 'результат.pdf');
+    
+} catch (ConverterNotAvailableException $e) {
+    // LibreOffice не установлен или не найден
+    echo "LibreOffice необходим для конвертации Office документов.\n";
+    echo "Ошибка: " . $e->getMessage() . "\n";
+    echo "Пожалуйста, установите LibreOffice или проверьте путь установки.\n";
+    
+} catch (ConversionException $e) {
+    // Конвертация не удалась (поврежденный файл, неподдерживаемые функции и т.д.)
+    echo "Конвертация документа не удалась: " . $e->getMessage() . "\n";
+    
+    // Проверка существования и доступности файла
+    if (!file_exists('документ.docx')) {
+        echo "Файл не существует.\n";
+    } elseif (!is_readable('документ.docx')) {
+        echo "Файл недоступен для чтения.\n";
+    } else {
+        echo "Файл может быть поврежден или содержать неподдерживаемые функции.\n";
+    }
+}
+```
+
+### Продвинутая конфигурация
+
+#### Настройки конвертеров
+
+```php
+$config = [
+    'default' => 'mpdf',
+    'mpdf' => [
+        'format' => 'A4',
+        'orientation' => 'L', // Альбомная ориентация
+        'margin_left' => 20,
+        'margin_right' => 20,
+        'margin_top' => 25,
+        'margin_bottom' => 25,
+        'default_font' => 'Arial',
+        'default_font_size' => 12
+    ],
+    'tcpdf' => [
+        'format' => 'A3',
+        'orientation' => 'P', // Книжная ориентация
+        'font' => [
+            'family' => 'helvetica',
+            'size' => 14
+        ]
+    ]
+];
+
+$pdfBridge = new PDFBridge($config);
+```
+
+#### С пользовательским логгером
+
+```php
+use Psr\Log\LoggerInterface;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+// Создание пользовательского логгера
+$logger = new Logger('pdf-bridge');
+$logger->pushHandler(new StreamHandler('pdf-conversions.log', Logger::INFO));
+
+$pdfBridge = new PDFBridge($config, $logger);
+
+// Все операции будут логироваться в pdf-conversions.log
+$pdfBridge->convertText('Привет, мир!', 'output.pdf');
+```
+
+### Реальные примеры для Laravel
+
+#### Генерация счетов для интернет-магазина
+
+```php
+class InvoiceService
+{
+    public function __construct(private PDFBridge $pdfBridge)
+    {
+    }
+    
+    public function generateInvoice(Order $order): string
+    {
+        $html = view('invoices.template', [
+            'order' => $order,
+            'customer' => $order->customer,
+            'items' => $order->items,
+            'total' => $order->total
+        ])->render();
+        
+        $filename = "invoice-{$order->id}.pdf";
+        $path = storage_path("app/invoices/{$filename}");
+        
+        try {
+            $this->pdfBridge->convertHTML($html, $path, [
+                'format' => 'A4',
+                'orientation' => 'P',
+                'margin_left' => 15,
+                'margin_right' => 15
+            ]);
+            
+            return $path;
+            
+        } catch (ConversionException $e) {
+            Log::error('Ошибка генерации счета', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            throw new \Exception('Не удалось создать PDF счет');
+        }
+    }
+}
+```
+
+#### Очереди для больших документов
+
+```php
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use MadArlan\PDFBridge\PDFBridge;
+
+class GeneratePDFJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, SerializesModels;
+    
+    public function __construct(
+        private string $htmlContent,
+        private string $outputPath
+    ) {}
+    
+    public function handle(PDFBridge $pdfBridge): void
+    {
+        $pdfBridge->convertHTML($this->htmlContent, $this->outputPath);
+        
+        // Уведомить пользователя или выполнить дополнительные действия
+    }
+}
+
+// Запуск задачи
+GeneratePDFJob::dispatch($htmlContent, $outputPath);
+```
+
+#### Массовая обработка документов
+
+```php
+class DocumentProcessor
+{
+    public function __construct(private PDFBridge $pdfBridge)
+    {
+    }
+    
+    public function processBatch(array $files): array
+    {
+        $results = [];
+        
+        foreach ($files as $file) {
+            try {
+                $outputPath = $this->getOutputPath($file);
+                $this->pdfBridge->convertFile($file, $outputPath);
+                
+                $results[] = [
+                    'file' => $file,
+                    'status' => 'success',
+                    'output' => $outputPath
+                ];
+                
+            } catch (\Exception $e) {
+                $results[] = [
+                    'file' => $file,
+                    'status' => 'error',
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+        
+        return $results;
+    }
+    
+    private function getOutputPath(string $inputFile): string
+    {
+        $pathInfo = pathinfo($inputFile);
+        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.pdf';
     }
 }
 ```
