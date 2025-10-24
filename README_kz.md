@@ -2,7 +2,8 @@
 
 ![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
 
-Әртүрлі форматтарды PDF-ке түрлендіру үшін бірнеше конвертерді (TCPDF, mPDF, LibreOffice) пайдаланатын әмбебап Laravel пакеті.
+Әртүрлі форматтарды PDF-ке түрлендіру үшін бірнеше конвертерді (TCPDF, mPDF, LibreOffice) пайдаланатын әмбебап Laravel
+пакеті.
 
 ## Мүмкіндіктер
 
@@ -19,7 +20,7 @@
 ### 1. Пакетті орнату
 
 ```bash
-composer require madarlan/pdf-bridge
+composer require madarlan/pdf-bridge-php
 ```
 
 ### 2. Конфигурацияны жариялау (міндетті емес)
@@ -31,16 +32,19 @@ php artisan vendor:publish --provider="MadArlan\PDFBridge\PDFBridgeServiceProvid
 ### 3. Конвертерлерді орнату
 
 #### TCPDF (автоматты орнатылады)
+
 ```bash
 # Пакетке қосылған
 ```
 
 #### mPDF
+
 ```bash
 composer require mpdf/mpdf
 ```
 
 #### LibreOffice (DOC/DOCX/XLS/XLSX үшін)
+
 ```bash
 # LibreOffice орнату
 # Ubuntu/Debian:
@@ -343,7 +347,8 @@ php artisan pdf:convert --diagnose
 php artisan pdf:convert --formats
 ```
 
-Команда файл кеңейтімі немесе мазмұн талдауы негізінде кіріс түрін автоматты анықтайды, барлық конвертер түрлерін қолдайды және толық қате хабарлары мен диагностиканы ұсынады.
+Команда файл кеңейтімі немесе мазмұн талдауы негізінде кіріс түрін автоматты анықтайды, барлық конвертер түрлерін
+қолдайды және толық қате хабарлары мен диагностиканы ұсынады.
 
 ## Қателерді өңдеу
 
@@ -396,6 +401,7 @@ MIT лицензиясы. Толық мәліметтер үшін [LICENSE](LIC
 ## Өзгерістер журналы
 
 ### v1.0.0
+
 - Алғашқы шығарылым
 - TCPDF, mPDF, LibreOffice қолдауы
 - Мәтін, HTML, CSV, DOC/DOCX, XLS/XLSX түрлендіру

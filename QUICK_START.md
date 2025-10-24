@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-composer require madarlan/pdf-bridge
+composer require madarlan/pdf-bridge-php
 ```
 
 ## Basic Usage
@@ -48,16 +48,16 @@ php artisan pdf:convert --diagnose
 
 ## Supported Formats
 
-| Input | Output | Converter |
-|-------|--------|-----------|
-| `.txt` | PDF | TCPDF, mPDF |
-| `.html`, `.htm` | PDF | mPDF, TCPDF |
-| `.csv` | PDF | TCPDF, mPDF, LibreOffice |
-| `.doc`, `.docx` | PDF | LibreOffice |
-| `.xls`, `.xlsx` | PDF | LibreOffice |
-| `.ppt`, `.pptx` | PDF | LibreOffice |
-| `.odt`, `.ods`, `.odp` | PDF | LibreOffice |
-| `.rtf` | PDF | LibreOffice |
+| Input                  | Output | Converter                |
+|------------------------|--------|--------------------------|
+| `.txt`                 | PDF    | TCPDF, mPDF              |
+| `.html`, `.htm`        | PDF    | mPDF, TCPDF              |
+| `.csv`                 | PDF    | TCPDF, mPDF, LibreOffice |
+| `.doc`, `.docx`        | PDF    | LibreOffice              |
+| `.xls`, `.xlsx`        | PDF    | LibreOffice              |
+| `.ppt`, `.pptx`        | PDF    | LibreOffice              |
+| `.odt`, `.ods`, `.odp` | PDF    | LibreOffice              |
+| `.rtf`                 | PDF    | LibreOffice              |
 
 ## Error Handling
 

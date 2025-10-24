@@ -1,9 +1,21 @@
 {
-    "name": "madarlan/pdf-bridge",
+    "name": "madarlan/pdf-bridge-php",
     "description": "Universal PHP package for converting text, HTML, DOC/DOCX, XLS/XLSX, CSV to PDF using multiple libraries (TCPDF, mPDF, LibreOffice)",
     "type": "library",
     "license": "MIT",
-    "keywords": ["pdf", "converter", "tcpdf", "mpdf", "libreoffice", "laravel", "doc", "docx", "xls", "xlsx", "html"],
+    "keywords": [
+        "pdf",
+        "converter",
+        "tcpdf",
+        "mpdf",
+        "libreoffice",
+        "laravel",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "html"
+    ],
     "authors": [
         {
             "name": "MadArlan",

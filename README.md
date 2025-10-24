@@ -3,13 +3,14 @@
 ![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/madarlan/pdf-bridge/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/madarlan/pdf-bridge/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![License](https://img.shields.io/packagist/l/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![PHP Version Require](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![License](https://img.shields.io/packagist/l/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![PHP Version Require](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
 
-A powerful and universal Laravel package for converting various document formats to PDF using multiple converters (TCPDF, mPDF, LibreOffice). Features robust validation, comprehensive logging, and support for 15+ file formats.
+A powerful and universal Laravel package for converting various document formats to PDF using multiple converters (
+TCPDF, mPDF, LibreOffice). Features robust validation, comprehensive logging, and support for 15+ file formats.
 
 > 🚀 **Quick Start**: New to PDF Bridge? Check out our [Quick Start Guide](QUICK_START.md) for a rapid introduction!
 
@@ -33,7 +34,7 @@ A powerful and universal Laravel package for converting various document formats
 ### 1. Install the package
 
 ```bash
-composer require madarlan/pdf-bridge
+composer require madarlan/pdf-bridge-php
 ```
 
 ### 2. Publish configuration (optional)
@@ -45,16 +46,19 @@ php artisan vendor:publish --provider="MadArlan\PDFBridge\Laravel\PDFBridgeServi
 ### 3. Install converters
 
 #### TCPDF (installed automatically)
+
 ```bash
 # Already included in the package
 ```
 
 #### mPDF
+
 ```bash
 composer require mpdf/mpdf
 ```
 
 #### LibreOffice (for DOC/DOCX/XLS/XLSX)
+
 ```bash
 # Install LibreOffice
 # Ubuntu/Debian:
@@ -462,7 +466,8 @@ php artisan pdf:convert --diagnose
 php artisan pdf:convert --formats
 ```
 
-The command automatically detects input type based on file extension or content analysis, supports all converter types, and provides detailed error messages and diagnostics.
+The command automatically detects input type based on file extension or content analysis, supports all converter types,
+and provides detailed error messages and diagnostics.
 
 ## 🛡️ Error handling & Validation
 
@@ -495,21 +500,21 @@ try {
 - **TCPDF**: Included automatically
 - **mPDF**: `composer require mpdf/mpdf` (recommended)
 - **LibreOffice**: For office document support (DOC/DOCX/XLS/XLSX/PPT/PPTX/ODT/ODS/ODP)
-  - Install: `sudo apt-get install libreoffice` (Ubuntu/Debian)
-  - Package: `composer require ncjoes/office-converter`
+    - Install: `sudo apt-get install libreoffice` (Ubuntu/Debian)
+    - Package: `composer require ncjoes/office-converter`
 
 ## 📊 Supported Formats
 
-| Format | Extension | Converter | Description |
-|--------|-----------|-----------|-------------|
-| Text | `.txt` | TCPDF, mPDF | Plain text files |
-| HTML | `.html`, `.htm` | mPDF, TCPDF | Web pages and HTML content |
-| CSV | `.csv` | TCPDF, mPDF, LibreOffice | Comma-separated values |
-| Word | `.doc`, `.docx` | LibreOffice | Microsoft Word documents |
-| Excel | `.xls`, `.xlsx` | LibreOffice | Microsoft Excel spreadsheets |
-| PowerPoint | `.ppt`, `.pptx` | LibreOffice | Microsoft PowerPoint presentations |
-| OpenDocument | `.odt`, `.ods`, `.odp` | LibreOffice | OpenDocument formats |
-| Rich Text | `.rtf` | LibreOffice | Rich Text Format |
+| Format       | Extension              | Converter                | Description                        |
+|--------------|------------------------|--------------------------|------------------------------------|
+| Text         | `.txt`                 | TCPDF, mPDF              | Plain text files                   |
+| HTML         | `.html`, `.htm`        | mPDF, TCPDF              | Web pages and HTML content         |
+| CSV          | `.csv`                 | TCPDF, mPDF, LibreOffice | Comma-separated values             |
+| Word         | `.doc`, `.docx`        | LibreOffice              | Microsoft Word documents           |
+| Excel        | `.xls`, `.xlsx`        | LibreOffice              | Microsoft Excel spreadsheets       |
+| PowerPoint   | `.ppt`, `.pptx`        | LibreOffice              | Microsoft PowerPoint presentations |
+| OpenDocument | `.odt`, `.ods`, `.odp` | LibreOffice              | OpenDocument formats               |
+| Rich Text    | `.rtf`                 | LibreOffice              | Rich Text Format                   |
 
 ## 🧪 Testing
 
@@ -556,12 +561,12 @@ If you encounter issues:
 3. **List supported formats**: `php artisan pdf:convert --formats`
 4. **Check logs**: Review Laravel logs for detailed error information
 5. **Validate input**: Ensure files meet size and format requirements
-6. **Create an issue**: [GitHub Issues](https://github.com/madarlan/pdf-bridge/issues) with:
-   - PHP version
-   - Laravel version
-   - Error messages
-   - Sample code
-   - Input file details
+6. **Create an issue**: [GitHub Issues](https://github.com/madarlan/pdf-bridge-php/issues) with:
+    - PHP version
+    - Laravel version
+    - Error messages
+    - Sample code
+    - Input file details
 
 ### Common Issues
 
@@ -573,5 +578,6 @@ If you encounter issues:
 ## 🏆 Credits
 
 - **Author**: [MadArlan](https://github.com/madarlan)
-- **Contributors**: [All Contributors](https://github.com/madarlan/pdf-bridge/contributors)
-- **Powered by**: [TCPDF](https://tcpdf.org/), [mPDF](https://mpdf.github.io/), [LibreOffice](https://www.libreoffice.org/)
+- **Contributors**: [All Contributors](https://github.com/madarlan/pdf-bridge-php/contributors)
+- **Powered by
+  **: [TCPDF](https://tcpdf.org/), [mPDF](https://mpdf.github.io/), [LibreOffice](https://www.libreoffice.org/)

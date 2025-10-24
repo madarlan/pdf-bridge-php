@@ -1,10 +1,11 @@
 # Changelog
 
-All notable changes to `pdf-bridge` will be documented in this file.
+All notable changes to `pdf-bridge-php` will be documented in this file.
 
 ## [2.0.0] - 2024-10-24
 
 ### 🚀 Added
+
 - **New format support**: RTF, ODT, ODS, PPT, PPTX, ODP formats
 - **Input validation system**: File size limits, format validation, content verification
 - **Comprehensive logging**: PSR-3 compatible logging with detailed operation tracking
@@ -15,6 +16,7 @@ All notable changes to `pdf-bridge` will be documented in this file.
 - **Modern PHP 8.1+ features**: Match expressions, typed properties, constructor promotion
 
 ### 🔧 Enhanced
+
 - **PDFBridge class**: Complete rewrite with validation, logging, and error handling
 - **Configuration system**: Extended with validation and logging settings
 - **Exception handling**: More granular exception types and better error messages
@@ -23,24 +25,28 @@ All notable changes to `pdf-bridge` will be documented in this file.
 - **Method consistency**: Fixed naming inconsistencies (convertHtml → convertHTML)
 
 ### 🧪 Testing
+
 - **Unit tests**: Comprehensive test suite for core functionality
 - **Validation tests**: Tests for input validation and error scenarios
 - **PHPUnit configuration**: Modern PHPUnit 10+ configuration
 - **Test coverage**: Coverage for all major components
 
 ### 📚 Documentation
+
 - **Enhanced README**: Complete rewrite with badges, examples, and troubleshooting
 - **API documentation**: Detailed method documentation with examples
 - **Configuration guide**: Comprehensive configuration options
 - **Troubleshooting section**: Common issues and solutions
 
 ### 🔄 Changed
+
 - **Minimum PHP version**: Now requires PHP 8.1+
 - **Constructor signature**: Added optional logger parameter
 - **Configuration structure**: Reorganized for better clarity
 - **Error messages**: More descriptive and actionable error messages
 
 ### 🛠️ Technical Improvements
+
 - **Architecture**: Implemented SOLID principles and dependency injection
 - **Code quality**: PSR-12 compliant code style
 - **Type safety**: Full type declarations throughout codebase
@@ -49,6 +55,7 @@ All notable changes to `pdf-bridge` will be documented in this file.
 ## [1.0.0] - 2024-01-01
 
 ### 🎉 Initial Release
+
 - **Basic PDF conversion**: Text, HTML, CSV to PDF
 - **Multiple converters**: TCPDF, mPDF, LibreOffice support
 - **Laravel integration**: Service provider and facade
@@ -57,6 +64,7 @@ All notable changes to `pdf-bridge` will be documented in this file.
 - **Format support**: DOC/DOCX, XLS/XLSX conversion via LibreOffice
 
 ### 📋 Features
+
 - Automatic converter selection
 - Basic error handling
 - LibreOffice diagnostics

@@ -2,14 +2,16 @@
 
 ![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
 
-[![Последняя версия](https://img.shields.io/packagist/v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![Тесты](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge/run-tests.yml?branch=main&label=тесты&style=flat-square)](https://github.com/madarlan/pdf-bridge/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![Стиль кода](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge/fix-php-code-style-issues.yml?branch=main&label=стиль%20кода&style=flat-square)](https://github.com/madarlan/pdf-bridge/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Загрузки](https://img.shields.io/packagist/dt/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![Лицензия](https://img.shields.io/packagist/l/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![Последняя версия](https://img.shields.io/packagist/v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![Тесты](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/run-tests.yml?branch=main&label=тесты&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Стиль кода](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=стиль%20кода&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Загрузки](https://img.shields.io/packagist/dt/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![Лицензия](https://img.shields.io/packagist/l/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
 [![PHP версия](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
 
-Мощный и универсальный Laravel пакет для конвертации различных форматов документов в PDF с использованием нескольких конвертеров (TCPDF, mPDF, LibreOffice). Включает надежную валидацию, комплексное логирование и поддержку 15+ форматов файлов.с поддержкой Laravel 8-12.
+Мощный и универсальный Laravel пакет для конвертации различных форматов документов в PDF с использованием нескольких
+конвертеров (TCPDF, mPDF, LibreOffice). Включает надежную валидацию, комплексное логирование и поддержку 15+ форматов
+файлов.с поддержкой Laravel 8-12.
 
 ## Описание
 
@@ -22,6 +24,7 @@ PDF Bridge предоставляет единый интерфейс для к�
 ## Поддерживаемые форматы
 
 ### Входные форматы:
+
 - **Текст**: `.txt`, обычный текст
 - **HTML**: `.html`, `.htm`, HTML-разметка
 - **CSV**: `.csv`, табличные данные
@@ -29,6 +32,7 @@ PDF Bridge предоставляет единый интерфейс для к�
 - **Microsoft Excel**: `.xls`, `.xlsx`
 
 ### Выходной формат:
+
 - **PDF** - все конвертации производятся в PDF
 
 ## Установка
@@ -36,7 +40,7 @@ PDF Bridge предоставляет единый интерфейс для к�
 ### Через Composer
 
 ```bash
-composer require madarlan/pdf-bridge
+composer require madarlan/pdf-bridge-php
 ```
 
 ### Системные требования
@@ -49,25 +53,30 @@ composer require madarlan/pdf-bridge
 Для конвертации DOC/DOCX/XLS/XLSX файлов необходимо установить LibreOffice:
 
 #### Ubuntu/Debian:
+
 ```bash
 sudo apt-get update
 sudo apt-get install libreoffice
 ```
 
 #### CentOS/RHEL:
+
 ```bash
 sudo yum install libreoffice
 ```
 
 #### Windows:
+
 Скачайте и установите LibreOffice с [официального сайта](https://www.libreoffice.org/download/download/)
 
 #### macOS:
+
 ```bash
 brew install --cask libreoffice
 ```
 
 #### Docker/Dockerfile:
+
 ```dockerfile
 # Для Ubuntu/Debian базового образа
 FROM php:8.2-fpm
@@ -93,7 +102,8 @@ RUN apt-get update && apt-get install -y \
 # RUN apk add --no-cache libreoffice
 ```
 
-**Примечание для Docker**: LibreOffice в контейнере требует X11 сервер для работы. Для headless режима убедитесь, что используете флаг `--headless` при запуске LibreOffice.
+**Примечание для Docker**: LibreOffice в контейнере требует X11 сервер для работы. Для headless режима убедитесь, что
+используете флаг `--headless` при запуске LibreOffice.
 
 ## Интеграция с Laravel
 
@@ -131,7 +141,8 @@ php artisan vendor:publish --tag="pdf-bridge-config"
 
 ## ✨ Возможности
 
-- 🔄 **Универсальная конвертация**: 15+ форматов → PDF (Текст, HTML, CSV, DOC/DOCX, XLS/XLSX, PPT/PPTX, ODT, ODS, RTF и др.)
+- 🔄 **Универсальная конвертация**: 15+ форматов → PDF (Текст, HTML, CSV, DOC/DOCX, XLS/XLSX, PPT/PPTX, ODT, ODS, RTF и
+  др.)
 - ⚡ **Несколько конвертеров**: TCPDF, mPDF, LibreOffice с интеллектуальным автовыбором
 - 🛡️ **Валидация входных данных**: Ограничения размера файлов, проверка форматов, верификация содержимого
 - 📊 **Комплексное логирование**: Детальное отслеживание операций с совместимостью PSR-3
@@ -260,6 +271,7 @@ php artisan pdf:convert --list-converters
 #### Автоматическое определение типа:
 
 Команда автоматически определяет тип входных данных:
+
 - По расширению файла (.txt, .html, .csv, .doc, .docx, .xls, .xlsx)
 - По содержимому (HTML теги, CSV разделители)
 - По умолчанию считается текстом
@@ -651,18 +663,21 @@ try {
 ## Используемые библиотеки
 
 ### TCPDF
+
 - **Версия**: ^6.6
 - **Назначение**: Генерация PDF из текста, HTML, CSV
 - **Особенности**: Легковесная, хорошая поддержка Unicode
 - **Сайт**: https://tcpdf.org/
 
 ### mPDF
+
 - **Версия**: ^8.2
 - **Назначение**: Расширенная работа с HTML и CSS
 - **Особенности**: Лучшая поддержка CSS, шрифтов, изображений
 - **Сайт**: https://mpdf.github.io/
 
 ### ncjoes/office-converter
+
 - **Версия**: ^1.0
 - **Назначение**: Конвертация офисных документов через LibreOffice
 - **Требования**: LibreOffice должен быть установлен на сервере
@@ -716,13 +731,14 @@ MIT License. Подробности в файле [LICENSE](LICENSE).
 
 Если у вас возникли проблемы или вопросы:
 
-1. Проверьте [Issues](https://github.com/madarlan/pdf-bridge/issues)
+1. Проверьте [Issues](https://github.com/madarlan/pdf-bridge-php/issues)
 2. Создайте новый Issue с подробным описанием проблемы
 3. Укажите версии PHP, Laravel и используемых библиотек
 
 ## Changelog
 
 ### v1.0.0
+
 - Первый релиз
 - Поддержка TCPDF, mPDF, LibreOffice
 - Интеграция с Laravel 8-12
