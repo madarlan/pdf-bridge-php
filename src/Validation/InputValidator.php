@@ -19,7 +19,7 @@ class InputValidator
                 'txt', 'html', 'htm', 'csv',
                 'doc', 'docx', 'odt', 'rtf',
                 'xls', 'xlsx', 'ods',
-                'ppt', 'pptx', 'odp'
+                'ppt', 'pptx', 'odp',
             ],
             'max_text_length' => 1024 * 1024, // 1MB
         ], $config);
@@ -28,16 +28,15 @@ class InputValidator
     /**
      * Validate file input
      *
-     * @param string $filePath
      * @throws ValidationException
      */
     public function validateFile(string $filePath): void
     {
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             throw new ValidationException("File not found: {$filePath}");
         }
 
-        if (!is_readable($filePath)) {
+        if (! is_readable($filePath)) {
             throw new ValidationException("File is not readable: {$filePath}");
         }
 
@@ -53,9 +52,9 @@ class InputValidator
 
         // Check file extension
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        if (!in_array($extension, $this->config['allowed_extensions'])) {
+        if (! in_array($extension, $this->config['allowed_extensions'])) {
             throw new ValidationException(
-                "Unsupported file extension: {$extension}. Allowed: " . 
+                "Unsupported file extension: {$extension}. Allowed: ".
                 implode(', ', $this->config['allowed_extensions'])
             );
         }
@@ -64,13 +63,12 @@ class InputValidator
     /**
      * Validate text input
      *
-     * @param string $text
      * @throws ValidationException
      */
     public function validateText(string $text): void
     {
         if (empty(trim($text))) {
-            throw new ValidationException("Text content cannot be empty");
+            throw new ValidationException('Text content cannot be empty');
         }
 
         if (strlen($text) > $this->config['max_text_length']) {
@@ -85,23 +83,22 @@ class InputValidator
     /**
      * Validate output path
      *
-     * @param string $outputPath
      * @throws ValidationException
      */
     public function validateOutputPath(string $outputPath): void
     {
         $directory = dirname($outputPath);
-        
-        if (!is_dir($directory) && !mkdir($directory, 0755, true)) {
+
+        if (! is_dir($directory) && ! mkdir($directory, 0755, true)) {
             throw new ValidationException("Cannot create output directory: {$directory}");
         }
 
-        if (!is_writable($directory)) {
+        if (! is_writable($directory)) {
             throw new ValidationException("Output directory is not writable: {$directory}");
         }
 
         // Check if file already exists and is writable
-        if (file_exists($outputPath) && !is_writable($outputPath)) {
+        if (file_exists($outputPath) && ! is_writable($outputPath)) {
             throw new ValidationException("Output file exists and is not writable: {$outputPath}");
         }
     }
@@ -109,8 +106,6 @@ class InputValidator
     /**
      * Validate CSV content
      *
-     * @param string $csvContent
-     * @param array $options
      * @throws ValidationException
      */
     public function validateCSV(string $csvContent, array $options = []): void
@@ -119,21 +114,23 @@ class InputValidator
 
         $delimiter = $options['csv_delimiter'] ?? ',';
         $lines = explode("\n", trim($csvContent));
-        
+
         if (count($lines) < 1) {
-            throw new ValidationException("CSV must contain at least one line");
+            throw new ValidationException('CSV must contain at least one line');
         }
 
         // Check if all lines have consistent number of columns
         $firstLineColumns = count(str_getcsv($lines[0], $delimiter));
-        
+
         foreach ($lines as $lineNumber => $line) {
-            if (empty(trim($line))) continue;
-            
+            if (empty(trim($line))) {
+                continue;
+            }
+
             $columns = count(str_getcsv($line, $delimiter));
             if ($columns !== $firstLineColumns) {
                 throw new ValidationException(
-                    "CSV line " . ($lineNumber + 1) . " has {$columns} columns, expected {$firstLineColumns}"
+                    'CSV line '.($lineNumber + 1)." has {$columns} columns, expected {$firstLineColumns}"
                 );
             }
         }
@@ -141,8 +138,6 @@ class InputValidator
 
     /**
      * Get configuration
-     *
-     * @return array
      */
     public function getConfig(): array
     {
@@ -151,13 +146,11 @@ class InputValidator
 
     /**
      * Set configuration
-     *
-     * @param array $config
-     * @return self
      */
     public function setConfig(array $config): self
     {
         $this->config = array_merge($this->config, $config);
+
         return $this;
     }
 }

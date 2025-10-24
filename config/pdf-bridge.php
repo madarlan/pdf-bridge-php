@@ -29,14 +29,14 @@ return [
         'encoding' => env('PDF_BRIDGE_TCPDF_ENCODING', 'UTF-8'),
         'diskcache' => env('PDF_BRIDGE_TCPDF_DISKCACHE', false),
         'pdfa' => env('PDF_BRIDGE_TCPDF_PDFA', false),
-        
+
         // Font settings
         'font' => [
             'family' => env('PDF_BRIDGE_TCPDF_FONT_FAMILY', 'helvetica'),
             'size' => env('PDF_BRIDGE_TCPDF_FONT_SIZE', 12),
             'style' => env('PDF_BRIDGE_TCPDF_FONT_STYLE', ''),
         ],
-        
+
         // Margins
         'margins' => [
             'left' => env('PDF_BRIDGE_TCPDF_MARGIN_LEFT', 15),
@@ -46,14 +46,14 @@ return [
             'header' => env('PDF_BRIDGE_TCPDF_MARGIN_HEADER', 5),
             'footer' => env('PDF_BRIDGE_TCPDF_MARGIN_FOOTER', 10),
         ],
-        
+
         // Header and Footer
         'header' => [
             'enabled' => env('PDF_BRIDGE_TCPDF_HEADER_ENABLED', false),
             'title' => env('PDF_BRIDGE_TCPDF_HEADER_TITLE', ''),
             'string' => env('PDF_BRIDGE_TCPDF_HEADER_STRING', ''),
         ],
-        
+
         'footer' => [
             'enabled' => env('PDF_BRIDGE_TCPDF_FOOTER_ENABLED', false),
         ],
@@ -79,7 +79,7 @@ return [
         'margin_header' => env('PDF_BRIDGE_MPDF_MARGIN_HEADER', 9),
         'margin_footer' => env('PDF_BRIDGE_MPDF_MARGIN_FOOTER', 9),
         'orientation' => env('PDF_BRIDGE_MPDF_ORIENTATION', 'P'), // P=Portrait, L=Landscape
-        
+
         // Advanced options
         'tempDir' => env('PDF_BRIDGE_MPDF_TEMP_DIR', sys_get_temp_dir()),
         'fontDir' => env('PDF_BRIDGE_MPDF_FONT_DIR', null),
@@ -104,13 +104,13 @@ return [
         'bin' => env('PDF_BRIDGE_LIBREOFFICE_BIN', '/usr/bin/libreoffice'),
         'temp_dir' => env('PDF_BRIDGE_LIBREOFFICE_TEMP_DIR', sys_get_temp_dir()),
         'timeout' => env('PDF_BRIDGE_LIBREOFFICE_TIMEOUT', 120), // seconds
-        
+
         // Supported input formats
         'supported_formats' => [
             'doc', 'docx', 'odt', 'rtf',
             'xls', 'xlsx', 'ods', 'csv',
             'ppt', 'pptx', 'odp',
-            'html', 'htm'
+            'html', 'htm',
         ],
     ],
 
@@ -131,7 +131,7 @@ return [
             'txt', 'html', 'htm',
             'doc', 'docx', 'odt', 'rtf',
             'xls', 'xlsx', 'ods', 'csv',
-            'ppt', 'pptx', 'odp'
+            'ppt', 'pptx', 'odp',
         ],
     ],
 
@@ -150,7 +150,7 @@ return [
             'txt', 'html', 'htm',
             'doc', 'docx', 'odt', 'rtf',
             'xls', 'xlsx', 'ods', 'csv',
-            'ppt', 'pptx', 'odp'
+            'ppt', 'pptx', 'odp',
         ],
     ],
 

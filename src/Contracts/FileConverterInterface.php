@@ -13,10 +13,6 @@ interface FileConverterInterface extends ConverterInterface
     /**
      * Convert file to PDF
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */
@@ -25,10 +21,6 @@ interface FileConverterInterface extends ConverterInterface
     /**
      * Convert document to PDF
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */
@@ -37,10 +29,6 @@ interface FileConverterInterface extends ConverterInterface
     /**
      * Convert spreadsheet to PDF
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */

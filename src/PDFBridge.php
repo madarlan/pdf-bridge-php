@@ -2,15 +2,15 @@
 
 namespace MadArlan\PDFBridge;
 
-use MadArlan\PDFBridge\Converters\TCPDFConverter;
 use MadArlan\PDFBridge\Converters\MPDFConverter;
 use MadArlan\PDFBridge\Converters\OfficeConverter;
+use MadArlan\PDFBridge\Converters\TCPDFConverter;
 use MadArlan\PDFBridge\Exceptions\ConversionException;
-use MadArlan\PDFBridge\Exceptions\UnsupportedFormatException;
 use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
+use MadArlan\PDFBridge\Exceptions\UnsupportedFormatException;
 use MadArlan\PDFBridge\Exceptions\ValidationException;
-use MadArlan\PDFBridge\Validation\InputValidator;
 use MadArlan\PDFBridge\Support\Logger;
+use MadArlan\PDFBridge\Validation\InputValidator;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,10 +19,15 @@ use Psr\Log\LoggerInterface;
 class PDFBridge
 {
     protected array $config;
+
     protected ?TCPDFConverter $tcpdfConverter = null;
+
     protected ?MPDFConverter $mpdfConverter = null;
+
     protected ?OfficeConverter $officeConverter = null;
+
     protected InputValidator $validator;
+
     protected Logger $logger;
 
     public function __construct(array $config = [], ?LoggerInterface $logger = null)
@@ -35,38 +40,33 @@ class PDFBridge
     /**
      * Convert text to PDF
      *
-     * @param string $text
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     public function convertText(string $text, ?string $outputPath = null, array $options = []): string
     {
         $startTime = microtime(true);
-        
+
         try {
             // Validate input
             $this->validator->validateText($text);
             if ($outputPath) {
                 $this->validator->validateOutputPath($outputPath);
             }
-            
+
             $converter = $this->getPreferredConverter('text', $options);
             $this->logger->logConversionStart('text', $text, $converter);
-            
+
             $result = match ($converter) {
                 'tcpdf' => $this->getTCPDFConverter()->convertText($text, $outputPath, $options),
                 'mpdf' => $this->getMPDFConverter()->convertText($text, $outputPath, $options),
-                default => throw new ConversionException("No suitable converter found for text conversion")
+                default => throw new ConversionException('No suitable converter found for text conversion')
             };
-            
+
             $duration = microtime(true) - $startTime;
             $fileSize = $outputPath && file_exists($outputPath) ? filesize($outputPath) : 0;
             $this->logger->logConversionSuccess('text', $result, $duration, $fileSize);
-            
+
             return $result;
-            
         } catch (ValidationException $e) {
             $this->logger->logValidationError('text', $e->getMessage());
             throw $e;
@@ -79,38 +79,33 @@ class PDFBridge
     /**
      * Convert HTML to PDF
      *
-     * @param string $html
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     public function convertHTML(string $html, ?string $outputPath = null, array $options = []): string
     {
         $startTime = microtime(true);
-        
+
         try {
             // Validate input
             $this->validator->validateText($html);
             if ($outputPath) {
                 $this->validator->validateOutputPath($outputPath);
             }
-            
+
             $converter = $this->getPreferredConverter('html', $options);
             $this->logger->logConversionStart('html', $html, $converter);
-            
+
             $result = match ($converter) {
                 'mpdf' => $this->getMPDFConverter()->convertHTML($html, $outputPath, $options),
                 'tcpdf' => $this->getTCPDFConverter()->convertHTML($html, $outputPath, $options),
-                default => throw new ConversionException("No suitable converter found for HTML conversion")
+                default => throw new ConversionException('No suitable converter found for HTML conversion')
             };
-            
+
             $duration = microtime(true) - $startTime;
             $fileSize = $outputPath && file_exists($outputPath) ? filesize($outputPath) : 0;
             $this->logger->logConversionSuccess('html', $result, $duration, $fileSize);
-            
+
             return $result;
-            
         } catch (ValidationException $e) {
             $this->logger->logValidationError('html', $e->getMessage());
             throw $e;
@@ -123,38 +118,33 @@ class PDFBridge
     /**
      * Convert CSV to PDF
      *
-     * @param string $csvContent
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     public function convertCSV(string $csvContent, ?string $outputPath = null, array $options = []): string
     {
         $startTime = microtime(true);
-        
+
         try {
             // Validate input
             $this->validator->validateCSV($csvContent, $options);
             if ($outputPath) {
                 $this->validator->validateOutputPath($outputPath);
             }
-            
+
             $converter = $this->getPreferredConverter('csv', $options);
             $this->logger->logConversionStart('csv', $csvContent, $converter);
-            
+
             $result = match ($converter) {
                 'tcpdf' => $this->getTCPDFConverter()->convertCSV($csvContent, $outputPath, $options),
                 'mpdf' => $this->getMPDFConverter()->convertCSV($csvContent, $outputPath, $options),
-                default => throw new ConversionException("No suitable converter found for CSV conversion")
+                default => throw new ConversionException('No suitable converter found for CSV conversion')
             };
-            
+
             $duration = microtime(true) - $startTime;
             $fileSize = $outputPath && file_exists($outputPath) ? filesize($outputPath) : 0;
             $this->logger->logConversionSuccess('csv', $result, $duration, $fileSize);
-            
+
             return $result;
-            
         } catch (ValidationException $e) {
             $this->logger->logValidationError('csv', $e->getMessage());
             throw $e;
@@ -167,21 +157,17 @@ class PDFBridge
     /**
      * Convert DOC/DOCX file to PDF
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */
     public function convertDocument(string $inputPath, ?string $outputPath = null, array $options = []): string
     {
-        if (!file_exists($inputPath)) {
+        if (! file_exists($inputPath)) {
             throw new ConversionException("Input file not found: {$inputPath}");
         }
 
         $extension = strtolower(pathinfo($inputPath, PATHINFO_EXTENSION));
-        if (!in_array($extension, ['doc', 'docx'])) {
+        if (! in_array($extension, ['doc', 'docx'])) {
             throw new UnsupportedFormatException($extension, ['doc', 'docx']);
         }
 
@@ -191,21 +177,17 @@ class PDFBridge
     /**
      * Convert XLS/XLSX file to PDF
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */
     public function convertSpreadsheet(string $inputPath, ?string $outputPath = null, array $options = []): string
     {
-        if (!file_exists($inputPath)) {
+        if (! file_exists($inputPath)) {
             throw new ConversionException("Input file not found: {$inputPath}");
         }
 
         $extension = strtolower(pathinfo($inputPath, PATHINFO_EXTENSION));
-        if (!in_array($extension, ['xls', 'xlsx'])) {
+        if (! in_array($extension, ['xls', 'xlsx'])) {
             throw new UnsupportedFormatException($extension, ['xls', 'xlsx']);
         }
 
@@ -215,33 +197,28 @@ class PDFBridge
     /**
      * Convert PPT/PPTX file to PDF
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */
     public function convertPresentation(string $inputPath, ?string $outputPath = null, array $options = []): string
     {
         $startTime = microtime(true);
-        
+
         try {
             $this->validator->validateFile($inputPath);
             if ($outputPath) {
                 $this->validator->validateOutputPath($outputPath);
             }
-            
+
             $this->logger->logConversionStart('presentation', $inputPath, 'libreoffice');
-            
+
             $result = $this->getOfficeConverter()->convertPresentation($inputPath, $outputPath, $options);
-            
+
             $duration = microtime(true) - $startTime;
             $fileSize = file_exists($result) ? filesize($result) : 0;
             $this->logger->logConversionSuccess('presentation', $result, $duration, $fileSize);
-            
+
             return $result;
-            
         } catch (ValidationException $e) {
             $this->logger->logValidationError('presentation', $e->getMessage());
             throw $e;
@@ -254,21 +231,17 @@ class PDFBridge
     /**
      * Convert any supported file to PDF (auto-detect format)
      *
-     * @param string $inputPath
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      * @throws UnsupportedFormatException
      */
     public function convertFile(string $inputPath, ?string $outputPath = null, array $options = []): string
     {
-        if (!file_exists($inputPath)) {
+        if (! file_exists($inputPath)) {
             throw new ConversionException("Input file not found: {$inputPath}");
         }
 
         $extension = strtolower(pathinfo($inputPath, PATHINFO_EXTENSION));
-        
+
         return match ($extension) {
             'txt' => $this->convertText(file_get_contents($inputPath), $outputPath, $options),
             'html', 'htm' => $this->convertHTML(file_get_contents($inputPath), $outputPath, $options),
@@ -283,15 +256,12 @@ class PDFBridge
     /**
      * Get preferred converter for a specific format
      *
-     * @param string $format
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     protected function getPreferredConverter(string $format, array $options = []): string
     {
         // Check if converter is explicitly specified in options
-        if (!empty($options['converter'])) {
+        if (! empty($options['converter'])) {
             $requestedConverter = strtolower($options['converter']);
             if ($this->isConverterAvailable($requestedConverter, $format)) {
                 return $requestedConverter;
@@ -318,10 +288,6 @@ class PDFBridge
 
     /**
      * Check if a converter is available for a specific format
-     *
-     * @param string $converter
-     * @param string $format
-     * @return bool
      */
     protected function isConverterAvailable(string $converter, string $format): bool
     {
@@ -329,16 +295,19 @@ class PDFBridge
             switch ($converter) {
                 case 'tcpdf':
                     $conv = $this->getTCPDFConverter();
+
                     return in_array($format, $conv->getSupportedFormats());
-                    
+
                 case 'mpdf':
                     $conv = $this->getMPDFConverter();
+
                     return in_array($format, $conv->getSupportedFormats());
-                    
+
                 case 'libreoffice':
                     $conv = $this->getOfficeConverter();
+
                     return in_array($format, $conv->getSupportedFormats());
-                    
+
                 default:
                     return false;
             }
@@ -350,7 +319,6 @@ class PDFBridge
     /**
      * Get TCPDF converter instance
      *
-     * @return TCPDFConverter
      * @throws ConverterNotAvailableException
      */
     protected function getTCPDFConverter(): TCPDFConverter
@@ -359,14 +327,13 @@ class PDFBridge
             $config = $this->config['tcpdf'] ?? [];
             $this->tcpdfConverter = new TCPDFConverter($config);
         }
-        
+
         return $this->tcpdfConverter;
     }
 
     /**
      * Get mPDF converter instance
      *
-     * @return MPDFConverter
      * @throws ConverterNotAvailableException
      */
     protected function getMPDFConverter(): MPDFConverter
@@ -375,14 +342,13 @@ class PDFBridge
             $config = $this->config['mpdf'] ?? [];
             $this->mpdfConverter = new MPDFConverter($config);
         }
-        
+
         return $this->mpdfConverter;
     }
 
     /**
      * Get Office converter instance
      *
-     * @return OfficeConverter
      * @throws ConverterNotAvailableException
      */
     protected function getOfficeConverter(): OfficeConverter
@@ -391,117 +357,108 @@ class PDFBridge
             $config = $this->config['libreoffice'] ?? [];
             $this->officeConverter = new OfficeConverter($config);
         }
-        
+
         return $this->officeConverter;
     }
 
     /**
      * Get all supported file formats
-     *
-     * @return array
      */
     public function getSupportedFormats(): array
     {
         $formats = [];
-        
+
         try {
             $formats = array_merge($formats, $this->getTCPDFConverter()->getSupportedFormats());
         } catch (ConverterNotAvailableException $e) {
             // Ignore if not available
         }
-        
+
         try {
             $formats = array_merge($formats, $this->getMPDFConverter()->getSupportedFormats());
         } catch (ConverterNotAvailableException $e) {
             // Ignore if not available
         }
-        
+
         try {
             $formats = array_merge($formats, $this->getOfficeConverter()->getSupportedFormats());
         } catch (ConverterNotAvailableException $e) {
             // Ignore if not available
         }
-        
+
         // Add file formats
         $formats = array_merge($formats, ['txt', 'htm']);
-        
+
         return array_unique($formats);
     }
 
     /**
      * Get available converters with their status
-     *
-     * @return array
      */
     public function getAvailableConverters(): array
     {
         $converters = [];
-        
+
         try {
             $this->getTCPDFConverter();
             $converters['tcpdf'] = [
                 'available' => true,
-                'formats' => $this->getTCPDFConverter()->getSupportedFormats()
+                'formats' => $this->getTCPDFConverter()->getSupportedFormats(),
             ];
         } catch (ConverterNotAvailableException $e) {
             $converters['tcpdf'] = [
                 'available' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
-        
+
         try {
             $this->getMPDFConverter();
             $converters['mpdf'] = [
                 'available' => true,
-                'formats' => $this->getMPDFConverter()->getSupportedFormats()
+                'formats' => $this->getMPDFConverter()->getSupportedFormats(),
             ];
         } catch (ConverterNotAvailableException $e) {
             $converters['mpdf'] = [
                 'available' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
-        
+
         try {
             $this->getOfficeConverter();
             $converters['libreoffice'] = [
                 'available' => true,
                 'formats' => $this->getOfficeConverter()->getSupportedFormats(),
-                'version' => $this->getOfficeConverter()->getVersion()
+                'version' => $this->getOfficeConverter()->getVersion(),
             ];
         } catch (ConverterNotAvailableException $e) {
             $converters['libreoffice'] = [
                 'available' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
-        
+
         return $converters;
     }
 
     /**
      * Set configuration
-     *
-     * @param array $config
-     * @return self
      */
     public function setConfig(array $config): self
     {
         $this->config = array_merge($this->config, $config);
-        
+
         // Reset converter instances to apply new config
         $this->tcpdfConverter = null;
         $this->mpdfConverter = null;
         $this->officeConverter = null;
-        
+
         return $this;
     }
 
     /**
      * Get current configuration
-     *
-     * @return array
      */
     public function getConfig(): array
     {

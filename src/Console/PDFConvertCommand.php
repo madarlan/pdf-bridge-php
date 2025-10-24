@@ -3,9 +3,9 @@
 namespace MadArlan\PDFBridge\Console;
 
 use Illuminate\Console\Command;
-use MadArlan\PDFBridge\PDFBridge;
-use MadArlan\PDFBridge\Exceptions\UnsupportedFormatException;
 use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
+use MadArlan\PDFBridge\Exceptions\UnsupportedFormatException;
+use MadArlan\PDFBridge\PDFBridge;
 
 class PDFConvertCommand extends Command
 {
@@ -50,8 +50,6 @@ class PDFConvertCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -81,8 +79,6 @@ class PDFConvertCommand extends Command
 
     /**
      * Perform the main conversion
-     *
-     * @return int
      */
     protected function performConversion(): int
     {
@@ -97,7 +93,8 @@ class PDFConvertCommand extends Command
             if ($config) {
                 $configArray = json_decode($config, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    $this->error('Invalid JSON configuration format: ' . json_last_error_msg());
+                    $this->error('Invalid JSON configuration format: '.json_last_error_msg());
+
                     return 1;
                 }
                 $this->pdfBridge->setConfig($configArray);
@@ -109,13 +106,13 @@ class PDFConvertCommand extends Command
             }
 
             // Detect input data type
-            if (!$type) {
+            if (! $type) {
                 $type = $this->detectInputType($input);
                 $this->info("Auto-detected type: {$type}");
             }
 
             // Determine output file
-            if (!$output) {
+            if (! $output) {
                 $output = $this->generateOutputPath($input, $type);
             }
 
@@ -126,42 +123,40 @@ class PDFConvertCommand extends Command
             $result = $this->convertByType($input, $output, $type);
 
             if ($result) {
-                $this->info("✓ Conversion completed successfully!");
+                $this->info('✓ Conversion completed successfully!');
                 $this->info("Created file: {$output}");
-                
+
                 // Show file size
                 if (file_exists($output)) {
                     $size = $this->formatBytes(filesize($output));
                     $this->info("File size: {$size}");
                 }
-                
+
                 return 0;
             } else {
-                $this->error("✗ Conversion error");
+                $this->error('✗ Conversion error');
+
                 return 1;
             }
-
         } catch (UnsupportedFormatException $e) {
-            $this->error("✗ Unsupported format: " . $e->getMessage());
-            $this->info("Supported formats: " . implode(', ', $e->getSupportedFormats()));
+            $this->error('✗ Unsupported format: '.$e->getMessage());
+            $this->info('Supported formats: '.implode(', ', $e->getSupportedFormats()));
+
             return 1;
         } catch (ConverterNotAvailableException $e) {
-            $this->error("✗ Converter not available: " . $e->getMessage());
-            $this->info("Use --check to verify available converters");
+            $this->error('✗ Converter not available: '.$e->getMessage());
+            $this->info('Use --check to verify available converters');
+
             return 1;
         } catch (\Exception $e) {
-            $this->error("✗ Error: " . $e->getMessage());
+            $this->error('✗ Error: '.$e->getMessage());
+
             return 1;
         }
     }
 
     /**
      * Convert by detected type
-     *
-     * @param string $input
-     * @param string $output
-     * @param string $type
-     * @return bool
      */
     protected function convertByType(string $input, string $output, string $type): bool
     {
@@ -189,6 +184,7 @@ class PDFConvertCommand extends Command
     protected function convertText(string $input, string $output): bool
     {
         $content = $this->getInputContent($input);
+
         return $this->pdfBridge->convertText($content, $output);
     }
 
@@ -198,6 +194,7 @@ class PDFConvertCommand extends Command
     protected function convertHtml(string $input, string $output): bool
     {
         $content = $this->getInputContent($input);
+
         return $this->pdfBridge->convertHtml($content, $output);
     }
 
@@ -214,6 +211,7 @@ class PDFConvertCommand extends Command
             file_put_contents($tempFile, $input);
             $result = $this->pdfBridge->convertCsv($tempFile, $output);
             unlink($tempFile);
+
             return $result;
         }
     }
@@ -223,9 +221,10 @@ class PDFConvertCommand extends Command
      */
     protected function convertDocument(string $input, string $output): bool
     {
-        if (!file_exists($input)) {
+        if (! file_exists($input)) {
             throw new \InvalidArgumentException("File not found: {$input}");
         }
+
         return $this->pdfBridge->convertDocument($input, $output);
     }
 
@@ -234,9 +233,10 @@ class PDFConvertCommand extends Command
      */
     protected function convertSpreadsheet(string $input, string $output): bool
     {
-        if (!file_exists($input)) {
+        if (! file_exists($input)) {
             throw new \InvalidArgumentException("File not found: {$input}");
         }
+
         return $this->pdfBridge->convertSpreadsheet($input, $output);
     }
 
@@ -248,6 +248,7 @@ class PDFConvertCommand extends Command
         if (file_exists($input)) {
             return file_get_contents($input);
         }
+
         return $input;
     }
 
@@ -259,7 +260,7 @@ class PDFConvertCommand extends Command
         // If this is a file
         if (file_exists($input)) {
             $extension = strtolower(pathinfo($input, PATHINFO_EXTENSION));
-            
+
             switch ($extension) {
                 case 'txt':
                     return 'text';
@@ -279,10 +280,11 @@ class PDFConvertCommand extends Command
                 default:
                     // Try to determine by content
                     $content = file_get_contents($input);
+
                     return $this->detectContentType($content);
             }
         }
-        
+
         // If this is a string, determine by content
         return $this->detectContentType($input);
     }
@@ -293,7 +295,7 @@ class PDFConvertCommand extends Command
     protected function detectContentType(string $content): string
     {
         // HTML detection
-        if (preg_match('/<\s*html\s*>/i', $content) || 
+        if (preg_match('/<\s*html\s*>/i', $content) ||
             preg_match('/<\s*body\s*>/i', $content) ||
             preg_match('/<\s*div\s*>/i', $content) ||
             preg_match('/<\s*p\s*>/i', $content)) {
@@ -305,11 +307,11 @@ class PDFConvertCommand extends Command
         if (count($lines) > 1) {
             $firstLine = $lines[0];
             $secondLine = $lines[1];
-            
+
             // Check for separators
             $separators = [',', ';', '\t'];
             foreach ($separators as $sep) {
-                if (substr_count($firstLine, $sep) > 0 && 
+                if (substr_count($firstLine, $sep) > 0 &&
                     substr_count($firstLine, $sep) === substr_count($secondLine, $sep)) {
                     return 'csv';
                 }
@@ -327,9 +329,10 @@ class PDFConvertCommand extends Command
     {
         if (file_exists($input)) {
             $pathInfo = pathinfo($input);
-            return $pathInfo['dirname'] . DIRECTORY_SEPARATOR . $pathInfo['filename'] . '.pdf';
+
+            return $pathInfo['dirname'].DIRECTORY_SEPARATOR.$pathInfo['filename'].'.pdf';
         }
-        
+
         return 'output.pdf';
     }
 
@@ -338,13 +341,13 @@ class PDFConvertCommand extends Command
      */
     protected function checkConverters(): int
     {
-        $this->info("=== Checking converter availability ===");
-        
+        $this->info('=== Checking converter availability ===');
+
         $converters = $this->pdfBridge->getAvailableConverters();
-        
+
         foreach ($converters as $name => $info) {
             if ($info['available']) {
-                $this->info("✓ {$name}: " . implode(', ', $info['formats']));
+                $this->info("✓ {$name}: ".implode(', ', $info['formats']));
                 if (isset($info['version'])) {
                     $this->line("  Version: {$info['version']}");
                 }
@@ -352,7 +355,7 @@ class PDFConvertCommand extends Command
                 $this->error("✗ {$name}: {$info['error']}");
             }
         }
-        
+
         return 0;
     }
 
@@ -361,30 +364,30 @@ class PDFConvertCommand extends Command
      */
     protected function diagnoseLibreOffice(): int
     {
-        $this->info("=== LibreOffice Diagnostics ===");
-        
+        $this->info('=== LibreOffice Diagnostics ===');
+
         $diagnosis = $this->performLibreOfficeDiagnosis();
-        
-        $this->info("office-converter package: " . ($diagnosis['package_installed'] ? '✓' : '✗'));
-        
-        if (!empty($diagnosis['libreoffice_paths'])) {
-            $this->info("Found LibreOffice paths:");
+
+        $this->info('office-converter package: '.($diagnosis['package_installed'] ? '✓' : '✗'));
+
+        if (! empty($diagnosis['libreoffice_paths'])) {
+            $this->info('Found LibreOffice paths:');
             foreach ($diagnosis['libreoffice_paths'] as $path) {
                 $this->line("  - {$path}");
             }
-            $this->info("Used path: " . $diagnosis['found_path']);
-            $this->info("Version: " . ($diagnosis['version'] ?? 'not determined'));
+            $this->info('Used path: '.$diagnosis['found_path']);
+            $this->info('Version: '.($diagnosis['version'] ?? 'not determined'));
         } else {
-            $this->warn("LibreOffice not found");
+            $this->warn('LibreOffice not found');
         }
-        
-        if (!empty($diagnosis['errors'])) {
-            $this->error("Errors:");
+
+        if (! empty($diagnosis['errors'])) {
+            $this->error('Errors:');
             foreach ($diagnosis['errors'] as $error) {
                 $this->line("  - {$error}");
             }
         }
-        
+
         return 0;
     }
 
@@ -398,14 +401,15 @@ class PDFConvertCommand extends Command
             'libreoffice_paths' => [],
             'found_path' => null,
             'version' => null,
-            'errors' => []
+            'errors' => [],
         ];
-        
-        if (!$diagnosis['package_installed']) {
+
+        if (! $diagnosis['package_installed']) {
             $diagnosis['errors'][] = 'Package ncjoes/office-converter is not installed. Run: composer require ncjoes/office-converter';
+
             return $diagnosis;
         }
-        
+
         // Search for LibreOffice in standard locations
         $possiblePaths = [
             // Linux
@@ -417,28 +421,28 @@ class PDFConvertCommand extends Command
             'C:\Program Files\LibreOffice\program\soffice.exe',
             'C:\Program Files (x86)\LibreOffice\program\soffice.exe',
             // macOS
-            '/Applications/LibreOffice.app/Contents/MacOS/soffice'
+            '/Applications/LibreOffice.app/Contents/MacOS/soffice',
         ];
-        
+
         foreach ($possiblePaths as $path) {
             if (file_exists($path)) {
                 $diagnosis['libreoffice_paths'][] = $path;
-                if (!$diagnosis['found_path']) {
+                if (! $diagnosis['found_path']) {
                     $diagnosis['found_path'] = $path;
-                    
+
                     // Attempt to get version
-                    $command = escapeshellarg($path) . ' --version 2>&1';
+                    $command = escapeshellarg($path).' --version 2>&1';
                     $output = shell_exec($command);
                     $diagnosis['version'] = $output ? trim($output) : null;
                 }
             }
         }
-        
+
         if (empty($diagnosis['libreoffice_paths'])) {
             $diagnosis['errors'][] = 'LibreOffice not found in standard installation locations';
             $diagnosis['errors'][] = 'Install LibreOffice or specify path in configuration';
         }
-        
+
         return $diagnosis;
     }
 
@@ -447,14 +451,14 @@ class PDFConvertCommand extends Command
      */
     protected function listFormats(): int
     {
-        $this->info("=== Supported Formats ===");
-        
+        $this->info('=== Supported Formats ===');
+
         $formats = $this->pdfBridge->getSupportedFormats();
-        
+
         foreach ($formats as $format) {
             $this->line("• {$format}");
         }
-        
+
         return 0;
     }
 
@@ -463,14 +467,14 @@ class PDFConvertCommand extends Command
      */
     protected function listConverters(): int
     {
-        $this->info("=== Available Converters ===");
-        
+        $this->info('=== Available Converters ===');
+
         $converters = $this->pdfBridge->getAvailableConverters();
-        
+
         foreach ($converters as $name => $info) {
             if ($info['available']) {
                 $this->info("✓ {$name}");
-                $this->line("  Formats: " . implode(', ', $info['formats']));
+                $this->line('  Formats: '.implode(', ', $info['formats']));
                 if (isset($info['version'])) {
                     $this->line("  Version: {$info['version']}");
                 }
@@ -479,7 +483,7 @@ class PDFConvertCommand extends Command
                 $this->line("  Reason: {$info['error']}");
             }
         }
-        
+
         return 0;
     }
 
@@ -489,11 +493,11 @@ class PDFConvertCommand extends Command
     protected function formatBytes(int $bytes, int $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, $precision) . ' ' . $units[$i];
+
+        return round($bytes, $precision).' '.$units[$i];
     }
 }
