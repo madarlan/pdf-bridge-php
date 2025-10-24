@@ -6,13 +6,13 @@
 [![Стиль кода](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=стиль%20кода&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![PHP версия](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 
-Мощный и универсальный Laravel пакет для конвертации различных форматов документов в PDF с использованием нескольких
+Мощный и универсальный PHP/Laravel пакет для конвертации различных форматов документов в PDF с использованием нескольких
 конвертеров (TCPDF, mPDF, LibreOffice). Включает надежную валидацию, комплексное логирование и поддержку 15+ форматов
 файлов.с поддержкой Laravel 8-12.
 
 ## Описание
 
-PDF Bridge предоставляет единый интерфейс для конвертации документов в PDF, используя несколько мощных библиотек:
+PHP PDF Bridge предоставляет единый интерфейс для конвертации документов в PDF, используя несколько мощных библиотек:
 
 - **TCPDF** - для конвертации текста, HTML и CSV
 - **mPDF** - для расширенной работы с HTML и CSS

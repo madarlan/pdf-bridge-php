@@ -6,10 +6,32 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![PHP Version Require](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 
-A powerful and universal Laravel package for converting various document formats to PDF using multiple converters (
-TCPDF, mPDF, LibreOffice). Features robust validation, comprehensive logging, and support for 15+ file formats.
+A powerful and universal PHP/Laravel package for converting various document formats to PDF using multiple converters (TCPDF, mPDF, LibreOffice). Features robust validation, comprehensive logging, and support for 15+ file formats with Laravel 8-12 support.
 
-> 🚀 **Quick Start**: New to PDF Bridge? Check out our [Quick Start Guide](QUICK_START.md) for a rapid introduction!
+## Description
+
+PHP PDF Bridge provides a unified interface for document conversion to PDF using several powerful libraries:
+
+- **TCPDF** - for text, HTML and CSV conversion
+- **mPDF** - for advanced HTML and CSS processing
+- **LibreOffice** (via ncjoes/office-converter) - for DOC/DOCX/XLS/XLSX conversion
+
+## Supported Formats
+
+### Input formats:
+
+- **Text**: `.txt`, plain text files
+- **HTML**: `.html`, `.htm`, HTML markup
+- **CSV**: `.csv`, tabular data
+- **Microsoft Word**: `.doc`, `.docx`
+- **Microsoft Excel**: `.xls`, `.xlsx`
+- **Microsoft PowerPoint**: `.ppt`, `.pptx`
+- **OpenDocument**: `.odt`, `.ods`, `.odp`
+- **Rich Text**: `.rtf`
+
+### Output format:
+
+- **PDF** - all conversions produce PDF files
 
 ## ✨ Features
 
@@ -71,132 +93,52 @@ sudo yum install libreoffice
 composer require ncjoes/office-converter
 ```
 
-## ⚙️ Configuration
+## Advanced Features
 
-### Basic configuration
+### Conversion Parameter Configuration
 
 ```php
-// config/pdf-bridge.php
-return [
-    'default' => env('PDF_BRIDGE_DEFAULT_CONVERTER', 'mpdf'),
-    
-    // Converter configurations
-    'tcpdf' => [
-        'format' => 'A4',
-        'orientation' => 'P',
-        'font' => [
-            'family' => 'helvetica',
-            'size' => 12,
-        ],
-        'margins' => [
-            'left' => 15,
-            'top' => 27,
-            'right' => 15,
-            'bottom' => 25,
-        ],
-    ],
-    
-    'mpdf' => [
-        'format' => 'A4',
-        'default_font' => 'dejavusans',
-        'default_font_size' => 12,
-        'margin_left' => 15,
-        'margin_right' => 15,
-        'margin_top' => 16,
-        'margin_bottom' => 16,
-    ],
-    
-    'libreoffice' => [
-        'bin' => env('PDF_BRIDGE_LIBREOFFICE_BIN', '/usr/bin/libreoffice'),
-        'temp_dir' => env('PDF_BRIDGE_LIBREOFFICE_TEMP_DIR', sys_get_temp_dir()),
-        'timeout' => env('PDF_BRIDGE_LIBREOFFICE_TIMEOUT', 120),
-    ],
-    
-    // Validation settings
-    'validation' => [
-        'max_file_size' => env('PDF_BRIDGE_MAX_FILE_SIZE', 50 * 1024 * 1024), // 50MB
-        'max_text_length' => env('PDF_BRIDGE_MAX_TEXT_LENGTH', 1024 * 1024), // 1MB
-    ],
-    
-    // Logging configuration
-    'logging' => [
-        'enabled' => env('PDF_BRIDGE_LOGGING_ENABLED', true),
-        'channel' => env('PDF_BRIDGE_LOG_CHANNEL', 'default'),
+$options = [
+    'converter' => 'tcpdf',           // Force converter selection
+    'format' => 'A3',                // Page format
+    'orientation' => 'L',            // Orientation (P/L)
+    'font_size' => 14,               // Font size
+    'font_family' => 'helvetica',    // Font family
+    'title' => 'Document Title',
+    'author' => 'Document Author',
+    'subject' => 'Document Subject',
+    'keywords' => 'key, words',
+    'margins' => [
+        'left' => 20,
+        'right' => 20,
+        'top' => 30,
+        'bottom' => 30,
     ],
 ];
+
+$pdf = PDFBridge::convertHTML($html, null, $options);
 ```
 
-## 🚀 Usage
-
-### Basic usage
+### Working with CSV
 
 ```php
-use MadArlan\PDFBridge\PDFBridge;
+$csvContent = "Name,Age,City\nJohn,25,New York\nMary,30,Los Angeles";
 
-$pdfBridge = new PDFBridge();
+$options = [
+    'csv_delimiter' => ',',
+    'csv_has_header' => true,
+    'font_size' => 10,
+];
 
-// Convert text to PDF
-$pdfBridge->convertText('Hello World!', 'output.pdf');
-
-// Convert HTML to PDF
-$html = '<h1>Title</h1><p>Content</p>';
-$pdfBridge->convertHTML($html, 'output.pdf');
-
-// Convert CSV to PDF
-$csvContent = "Name,Age\nJohn,25\nJane,30";
-$pdfBridge->convertCSV($csvContent, 'output.pdf');
-
-// Convert documents (requires LibreOffice)
-$pdfBridge->convertDocument('document.docx', 'output.pdf');
-$pdfBridge->convertSpreadsheet('spreadsheet.xlsx', 'output.pdf');
-$pdfBridge->convertPresentation('presentation.pptx', 'output.pdf');
-
-// Auto-detect format and convert
-$pdfBridge->convertFile('any-supported-file.odt', 'output.pdf');
+$pdf = PDFBridge::convertCSV($csvContent, 'table.pdf', $options);
 ```
 
-### Using Laravel Facade
+### Checking Converter Availability
+
+#### Getting Information About All Converters
 
 ```php
-use PDFBridge;
-
-// Convert text
-PDFBridge::convertText('Hello World!', 'output.pdf');
-
-// Convert HTML
-PDFBridge::convertHTML('<h1>Title</h1>', 'output.pdf');
-
-// Convert presentations
-PDFBridge::convertPresentation('slides.pptx', 'output.pdf');
-
-// Auto-detect and convert
-PDFBridge::convertFile('document.odt', 'output.pdf');
-```
-
-### Configuration management
-
-```php
-// Set configuration
-$pdfBridge->setConfig([
-    'default' => 'mpdf',
-    'mpdf' => [
-        'format' => 'A3',
-        'orientation' => 'L',
-    ],
-    'validation' => [
-        'max_file_size' => 10 * 1024 * 1024, // 10MB
-    ]
-]);
-
-// Get current configuration
-$config = $pdfBridge->getConfig();
-```
-
-### 🔍 Checking converter availability
-
-```php
-// Check all converters
-$converters = $pdfBridge->getAvailableConverters();
+$converters = PDFBridge::getAvailableConverters();
 
 foreach ($converters as $name => $info) {
     if ($info['available']) {
@@ -209,285 +151,373 @@ foreach ($converters as $name => $info) {
     }
 }
 
-// Check specific converter
-if ($pdfBridge->isConverterAvailable('tcpdf')) {
-    echo "TCPDF is available\n";
-}
+// Example output:
+// ✓ tcpdf: text, html, csv
+// ✓ mpdf: text, html, csv
+// ✓ libreoffice: doc, docx, xls, xlsx
+//   Version: LibreOffice 7.4.7.2 40(Build:2)
+```
 
-if ($pdfBridge->isConverterAvailable('mpdf')) {
-    echo "mPDF is available\n";
-}
+#### Checking Specific Converter
 
-// Check LibreOffice
-if ($pdfBridge->isConverterAvailable('libreoffice')) {
-    echo "LibreOffice is available\n";
-    
-    // Get LibreOffice version
-    $converters = $pdfBridge->getAvailableConverters();
-    if (isset($converters['libreoffice']['version'])) {
-        echo "LibreOffice version: " . $converters['libreoffice']['version'] . "\n";
+```php
+// Check TCPDF availability
+try {
+    $tcpdfConverter = new \MadArlan\PDFBridge\Converters\TCPDFConverter();
+    if ($tcpdfConverter->isAvailable()) {
+        echo "TCPDF is available\n";
     }
-} else {
-    echo "LibreOffice is not available\n";
-    
-    // Get error details
-    $converters = $pdfBridge->getAvailableConverters();
-    echo "Error: " . $converters['libreoffice']['error'] . "\n";
+} catch (\MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException $e) {
+    echo "TCPDF unavailable: " . $e->getMessage() . "\n";
+}
+
+// Check mPDF availability
+try {
+    $mpdfConverter = new \MadArlan\PDFBridge\Converters\MPDFConverter();
+    if ($mpdfConverter->isAvailable()) {
+        echo "mPDF is available\n";
+    }
+} catch (\MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException $e) {
+    echo "mPDF unavailable: " . $e->getMessage() . "\n";
 }
 ```
 
-### 🛠️ LibreOffice troubleshooting & Validation
-
-#### Input validation
+#### Special LibreOffice Check
 
 ```php
-use MadArlan\PDFBridge\Exceptions\ValidationException;
+use MadArlan\PDFBridge\Converters\OfficeConverter;
+use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
+
+// Check with automatic LibreOffice detection
+try {
+    $officeConverter = new OfficeConverter();
+    
+    if ($officeConverter->isAvailable()) {
+        echo "✓ LibreOffice is available\n";
+        
+        // Get LibreOffice version
+        $version = $officeConverter->getVersion();
+        if ($version) {
+            echo "  Version: {$version}\n";
+        }
+        
+        // Supported formats
+        $formats = $officeConverter->getSupportedFormats();
+        echo "  Formats: " . implode(', ', $formats) . "\n";
+    }
+    
+} catch (ConverterNotAvailableException $e) {
+    echo "✗ LibreOffice unavailable: " . $e->getMessage() . "\n";
+    
+    // Possible reasons:
+    // - LibreOffice not installed
+    // - Incorrect LibreOffice path
+    // - Missing ncjoes/office-converter package
+}
+
+// Check with specified LibreOffice path
+$config = [
+    'libreoffice_path' => '/usr/bin/libreoffice', // Specify correct path
+    'temp_dir' => '/tmp',
+    'timeout' => 120
+];
 
 try {
-    $pdfBridge->convertText('', 'output.pdf'); // Will throw ValidationException
-} catch (ValidationException $e) {
-    echo "Validation error: " . $e->getMessage();
+    $officeConverter = new OfficeConverter($config);
+    echo "LibreOffice found at specified path\n";
+} catch (ConverterNotAvailableException $e) {
+    echo "LibreOffice not found: " . $e->getMessage() . "\n";
 }
 
-// Configure validation limits
-$pdfBridge->setConfig([
-    'validation' => [
-        'max_file_size' => 10 * 1024 * 1024, // 10MB
-        'max_text_length' => 500000, // 500KB
-        'allowed_extensions' => ['txt', 'html', 'doc', 'docx']
-    ]
-]);
-```
+// Check via main PDFBridge class
+$pdfBridge = new \MadArlan\PDFBridge\PDFBridge();
+$converters = $pdfBridge->getAvailableConverters();
 
-#### LibreOffice diagnostics
-
-```php
-/**
- * LibreOffice diagnostic function
- */
-function diagnoseLibreOffice() {
-    $diagnosis = [
-        'package_installed' => class_exists('NcJoes\OfficeConverter\OfficeConverter'),
-        'libreoffice_paths' => [],
-        'found_path' => null,
-        'version' => null,
-        'errors' => []
-    ];
-    
-    if (!$diagnosis['package_installed']) {
-        $diagnosis['errors'][] = 'Package ncjoes/office-converter is not installed';
-        return $diagnosis;
-    }
-    
-    // Search for LibreOffice in standard locations
-    $possiblePaths = [
-        '/usr/bin/libreoffice',
-        '/usr/bin/soffice',
-        '/opt/libreoffice/program/soffice',
-        'C:\Program Files\LibreOffice\program\soffice.exe',
-        'C:\Program Files (x86)\LibreOffice\program\soffice.exe',
-        '/Applications/LibreOffice.app/Contents/MacOS/soffice'
-    ];
-    
-    foreach ($possiblePaths as $path) {
-        if (file_exists($path)) {
-            $diagnosis['libreoffice_paths'][] = $path;
-            if (!$diagnosis['found_path']) {
-                $diagnosis['found_path'] = $path;
-                
-                // Get version
-                $output = shell_exec(escapeshellarg($path) . ' --version 2>&1');
-                $diagnosis['version'] = $output ? trim($output) : null;
-            }
-        }
-    }
-    
-    if (empty($diagnosis['libreoffice_paths'])) {
-        $diagnosis['errors'][] = 'LibreOffice not found in standard locations';
-    }
-    
-    return $diagnosis;
-}
-
-// Usage
-$diagnosis = diagnoseLibreOffice();
-
-echo "Package installed: " . ($diagnosis['package_installed'] ? 'Yes' : 'No') . "\n";
-
-if (!empty($diagnosis['libreoffice_paths'])) {
-    echo "Found LibreOffice paths:\n";
-    foreach ($diagnosis['libreoffice_paths'] as $path) {
-        echo "  - {$path}\n";
-    }
-    echo "Used path: " . $diagnosis['found_path'] . "\n";
-    echo "Version: " . ($diagnosis['version'] ?? 'not determined') . "\n";
-}
-
-if (!empty($diagnosis['errors'])) {
-    echo "Errors:\n";
-    foreach ($diagnosis['errors'] as $error) {
-        echo "  - {$error}\n";
-    }
+if ($converters['libreoffice']['available']) {
+    echo "LibreOffice ready to work\n";
+    echo "Version: " . ($converters['libreoffice']['version'] ?? 'unknown') . "\n";
+} else {
+    echo "LibreOffice problem: " . $converters['libreoffice']['error'] . "\n";
 }
 ```
 
-### 🎯 New format support
+## Usage
 
-```php
-// Document formats
-$pdfBridge->convertFile('document.odt', 'output.pdf');  // OpenDocument Text
-$pdfBridge->convertFile('document.rtf', 'output.pdf');  // Rich Text Format
+### Artisan Command for Quick Conversion
 
-// Spreadsheet formats  
-$pdfBridge->convertFile('spreadsheet.ods', 'output.pdf'); // OpenDocument Spreadsheet
-
-// Presentation formats
-$pdfBridge->convertFile('presentation.odp', 'output.pdf'); // OpenDocument Presentation
-$pdfBridge->convertPresentation('slides.ppt', 'output.pdf'); // PowerPoint
-```
-
-### 📊 Logging and monitoring
-
-```php
-use Psr\Log\LoggerInterface;
-
-// With custom logger
-$logger = app(LoggerInterface::class);
-$pdfBridge = new PDFBridge($config, $logger);
-
-// All operations are automatically logged:
-// - Conversion start/success/failure
-// - Validation errors
-// - Converter availability checks
-// - Performance metrics (duration, file size)
-```
-
-### 🎨 Advanced usage
-
-```php
-// Convert with options
-$options = [
-    'converter' => 'mpdf',
-    'font_family' => 'Arial',
-    'font_size' => 14,
-    'orientation' => 'L', // Landscape
-    'format' => 'A3'
-];
-
-$pdfBridge->convertHTML($html, 'output.pdf', $options);
-
-// CSV with custom delimiter
-$csvOptions = [
-    'csv_delimiter' => ';',
-    'csv_has_header' => true
-];
-
-$pdfBridge->convertCSV($csvContent, 'output.pdf', $csvOptions);
-```
-
-### 🎯 Artisan commands
-
-The package includes an Artisan command for quick PDF conversion:
+The package includes a convenient Artisan command for quick file conversion from the command line:
 
 ```bash
-# Basic conversion
-php artisan pdf:convert input.txt output.pdf
+# Basic command
+php artisan pdf:convert {input} [options]
 
-# Auto-detect input type
-php artisan pdf:convert input.html
+# Usage examples:
 
-# Specify input type
-php artisan pdf:convert "Hello World" --type=text --output=hello.pdf
+# Convert text file
+php artisan pdf:convert document.txt
 
-# Use specific converter
-php artisan pdf:convert input.html --converter=mpdf
+# Convert HTML file with output specification
+php artisan pdf:convert index.html --output=result.pdf
 
-# With JSON configuration
-php artisan pdf:convert input.html --config='{"mpdf":{"format":"A3","orientation":"L"}}'
+# Convert Word document with specific converter
+php artisan pdf:convert document.docx --converter=libreoffice
 
-# Convert CSV
-php artisan pdf:convert data.csv --type=csv
+# Convert CSV with settings
+php artisan pdf:convert data.csv --config='{"delimiter":";""encoding":"utf-8"}'
 
-# Convert documents (requires LibreOffice)
-php artisan pdf:convert document.docx
-php artisan pdf:convert spreadsheet.xlsx
-php artisan pdf:convert presentation.pptx
+# Convert text directly (without file)
+php artisan pdf:convert "Hello, World!" --type=text
 
-# Convert OpenDocument formats
-php artisan pdf:convert document.odt
-php artisan pdf:convert spreadsheet.ods
-php artisan pdf:convert presentation.odp
+# Convert HTML code
+php artisan pdf:convert "<h1>Title</h1><p>Content</p>" --type=html
+```
 
-# Check available converters
+#### Available Command Options:
+
+- `--output` - Output PDF file (default: input.pdf)
+- `--type` - Input data type (auto|text|html|csv|doc|docx|xls|xlsx)
+- `--converter` - Preferred converter (tcpdf|mpdf|libreoffice)
+- `--config` - JSON configuration for converter
+- `--check` - Check converter availability
+- `--diagnose` - LibreOffice diagnostics
+- `--list-formats` - Show supported formats
+- `--list-converters` - Show available converters
+
+#### Diagnostics and Checking Examples:
+
+```bash
+# Check all converter availability
 php artisan pdf:convert --check
 
-# Diagnose LibreOffice
+# LibreOffice diagnostics
 php artisan pdf:convert --diagnose
 
 # List supported formats
-php artisan pdf:convert --formats
+php artisan pdf:convert --list-formats
 
 # List available converters
-php artisan pdf:convert --list
+php artisan pdf:convert --list-converters
 ```
 
-#### Command options:
+#### Automatic Type Detection:
 
-- `--type` - Input type (text, html, csv, doc, docx, xls, xlsx)
-- `--output` - Output file path
-- `--converter` - Preferred converter (tcpdf, mpdf, libreoffice)
-- `--config` - JSON configuration
-- `--check` - Check converter availability
-- `--diagnose` - Diagnose LibreOffice installation
-- `--formats` - List supported formats
-- `--list` - List available converters
+The command automatically detects input data type:
 
-#### Examples:
+- By file extension (.txt, .html, .csv, .doc, .docx, .xls, .xlsx)
+- By content (HTML tags, CSV delimiters)
+- Defaults to text
+
+#### Configuration Examples:
 
 ```bash
-# Convert text file to PDF
-php artisan pdf:convert readme.txt
+# TCPDF with settings
+php artisan pdf:convert document.html --converter=tcpdf --config='{"orientation":"L","format":"A4"}'
 
-# Convert HTML with mPDF in landscape A3
-php artisan pdf:convert index.html --converter=mpdf --config='{"mpdf":{"format":"A3","orientation":"L"}}'
+# mPDF with settings
+php artisan pdf:convert document.html --converter=mpdf --config='{"margin_left":15,"margin_right":15}'
 
-# Convert CSV with custom output
-php artisan pdf:convert data.csv --output=/path/to/report.pdf
-
-# Convert Word document
-php artisan pdf:convert document.docx --output=document.pdf
-
-# Diagnostic commands
-php artisan pdf:convert --check
-php artisan pdf:convert --diagnose
-php artisan pdf:convert --formats
+# LibreOffice with timeout
+php artisan pdf:convert document.docx --converter=libreoffice --config='{"timeout":300}'
 ```
 
-The command automatically detects input type based on file extension or content analysis, supports all converter types,
-and provides detailed error messages and diagnostics.
-
-## 🛡️ Error handling & Validation
+### In Laravel (via Facade)
 
 ```php
+<?php
+
+use MadArlan\PDFBridge\Laravel\PDFBridge;
+
+class DocumentController extends Controller
+{
+    public function convertText()
+    {
+        $text = "Hello, World!\nThis is a test document.";
+        
+        // Convert to string
+        $pdfContent = PDFBridge::convertText($text);
+        
+        // Save to file
+        $filePath = PDFBridge::convertText($text, storage_path('app/document.pdf'));
+        
+        return response($pdfContent)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="document.pdf"');
+    }
+    
+    public function convertHTML()
+    {
+        $html = '<h1>Title</h1><p>This is <strong>HTML</strong> document.</p>';
+        
+        $options = [
+            'converter' => 'mpdf', // Force mPDF usage
+            'title' => 'My Document',
+            'author' => 'Author',
+        ];
+        
+        return PDFBridge::convertHTML($html, null, $options);
+    }
+    
+    public function convertDocument(Request $request)
+    {
+        $file = $request->file('document');
+        $inputPath = $file->store('temp');
+        
+        try {
+            $pdfPath = PDFBridge::convertFile(storage_path('app/' . $inputPath));
+            
+            return response()->download($pdfPath)->deleteFileAfterSend();
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+}
+```
+
+### In Laravel (via Dependency Injection)
+
+```php
+<?php
+
+use MadArlan\PDFBridge\PDFBridge;
+
+class DocumentService
+{
+    protected PDFBridge $pdfBridge;
+    
+    public function __construct(PDFBridge $pdfBridge)
+    {
+        $this->pdfBridge = $pdfBridge;
+    }
+    
+    public function processDocument(string $content, string $type): string
+    {
+        switch ($type) {
+            case 'text':
+                return $this->pdfBridge->convertText($content);
+            case 'html':
+                return $this->pdfBridge->convertHTML($content);
+            case 'csv':
+                return $this->pdfBridge->convertCSV($content);
+            default:
+                throw new \InvalidArgumentException("Unsupported type: {$type}");
+        }
+    }
+}
+```
+
+### Standalone Usage (without Laravel)
+
+```php
+<?php
+
+require_once 'vendor/autoload.php';
+
+use MadArlan\PDFBridge\PDFBridge;
+
+// Create instance with configuration
+$config = [
+    'default_converter' => 'mpdf',
+    'mpdf' => [
+        'format' => 'A4',
+        'default_font_size' => 14,
+    ],
+];
+
+$pdfBridge = new PDFBridge($config);
+
+// Convert text
+$text = "Sample text for PDF conversion";
+$pdfContent = $pdfBridge->convertText($text);
+file_put_contents('output.pdf', $pdfContent);
+
+// Convert HTML
+$html = '<h1>Title</h1><p>HTML content</p>';
+$pdfBridge->convertHTML($html, 'output.pdf');
+
+// Convert file
+$pdfBridge->convertFile('document.docx', 'converted.pdf');
+
+// Get available converters info
+$converters = $pdfBridge->getAvailableConverters();
+print_r($converters);
+```
+
+## Error Handling
+
+```php
+use MadArlan\PDFBridge\Exceptions\ConversionException;
 use MadArlan\PDFBridge\Exceptions\UnsupportedFormatException;
 use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
-use MadArlan\PDFBridge\Exceptions\ValidationException;
-use MadArlan\PDFBridge\Exceptions\ConversionException;
 
 try {
-    $pdfBridge->convertText('Hello World!', 'output.pdf');
-} catch (ValidationException $e) {
-    echo "Validation failed: " . $e->getMessage();
+    $pdf = PDFBridge::convertFile('document.unknown');
 } catch (UnsupportedFormatException $e) {
     echo "Unsupported format: " . $e->getMessage();
     echo "Supported formats: " . implode(', ', $e->getSupportedFormats());
 } catch (ConverterNotAvailableException $e) {
-    echo "Converter not available: " . $e->getMessage();
+    echo "Converter unavailable: " . $e->getMessage();
 } catch (ConversionException $e) {
     echo "Conversion failed: " . $e->getMessage();
-} catch (\Exception $e) {
-    echo "Unexpected error: " . $e->getMessage();
+    echo "Converter: " . $e->getConverterName();
 }
+```
+
+## Used Libraries
+
+### TCPDF
+
+- **Version**: ^6.6
+- **Purpose**: PDF generation from text, HTML, CSV
+- **Features**: Lightweight, good Unicode support
+- **Website**: https://tcpdf.org/
+
+### mPDF
+
+- **Version**: ^8.2
+- **Purpose**: Advanced HTML and CSS processing
+- **Features**: Better CSS support, fonts, images
+- **Website**: https://mpdf.github.io/
+
+### ncjoes/office-converter
+
+- **Version**: ^1.0
+- **Purpose**: Office document conversion via LibreOffice
+- **Requirements**: LibreOffice must be installed on server
+- **GitHub**: https://github.com/ncjoes/office-converter
+
+## Performance and Recommendations
+
+### Converter Selection
+
+- **TCPDF**: Better for simple documents, faster performance
+- **mPDF**: Better for complex HTML with CSS, images
+- **LibreOffice**: Only option for DOC/DOCX/XLS/XLSX
+
+### Optimization
+
+```php
+// Reuse instance
+$pdfBridge = app('pdf-bridge');
+
+// Configure temp directory for large files
+$config = [
+    'libreoffice' => [
+        'temp_dir' => '/tmp/pdf-bridge',
+        'timeout' => 300, // Increase for large files
+    ],
+];
+
+$pdfBridge->setConfig($config);
+```
+
+## Testing
+
+```bash
+# Install development dependencies
+composer install --dev
+
+# Run tests
+vendor/bin/phpunit
 ```
 
 ## 📋 Requirements
@@ -572,9 +602,34 @@ If you encounter issues:
 - **Permission denied**: Ensure output directory is writable
 - **Memory limit**: Increase PHP memory limit for large files
 
+## License
+
+MIT License. See [LICENSE](LICENSE) file for details.
+
+## Author
+
+- **GitHub**: [madarlan](https://github.com/madarlan)
+- **Email**: madinovarlan@gmail.com
+
+## Support
+
+If you encounter problems or have questions:
+
+1. Check [Issues](https://github.com/madarlan/pdf-bridge-php/issues)
+2. Create a new Issue with detailed problem description
+3. Include PHP, Laravel and library versions
+
+## Changelog
+
+### v1.0.0
+
+- Initial release
+- TCPDF, mPDF, LibreOffice support
+- Laravel 8-12 integration
+- Text, HTML, CSV, DOC/DOCX, XLS/XLSX to PDF conversion
+
 ## 🏆 Credits
 
 - **Author**: [MadArlan](https://github.com/madarlan)
 - **Contributors**: [All Contributors](https://github.com/madarlan/pdf-bridge-php/contributors)
-- **Powered by
-  **: [TCPDF](https://tcpdf.org/), [mPDF](https://mpdf.github.io/), [LibreOffice](https://www.libreoffice.org/)
+- **Powered by**: [TCPDF](https://tcpdf.org/), [mPDF](https://mpdf.github.io/), [LibreOffice](https://www.libreoffice.org/)
