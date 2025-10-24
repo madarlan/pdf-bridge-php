@@ -1,4 +1,4 @@
-# PDF Bridge
+# PHP PDF Bridge
 
 ![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
 

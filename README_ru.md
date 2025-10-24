@@ -1,13 +1,11 @@
-# PDF Bridge
+# PHP PDF Bridge
 
 ![PDF Bridge Cover](https://i.ibb.co/yFXgf2dG/madarlan-pdf-bridge.png)
 
-[![Последняя версия](https://img.shields.io/packagist/v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![Тесты](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/run-tests.yml?branch=main&label=тесты&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Последняя версия](https://img.shields.io/packagist/v/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 [![Стиль кода](https://img.shields.io/github/actions/workflow/status/madarlan/pdf-bridge-php/fix-php-code-style-issues.yml?branch=main&label=стиль%20кода&style=flat-square)](https://github.com/madarlan/pdf-bridge-php/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Загрузки](https://img.shields.io/packagist/dt/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![Лицензия](https://img.shields.io/packagist/l/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
-[![PHP версия](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge)
+[![Лицензия](https://img.shields.io/packagist/l/madarlan/pdf-bridge-php.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
+[![PHP версия](https://img.shields.io/packagist/php-v/madarlan/pdf-bridge.svg?style=flat-square)](https://packagist.org/packages/madarlan/pdf-bridge-php)
 
 Мощный и универсальный Laravel пакет для конвертации различных форматов документов в PDF с использованием нескольких
 конвертеров (TCPDF, mPDF, LibreOffice). Включает надежную валидацию, комплексное логирование и поддержку 15+ форматов
