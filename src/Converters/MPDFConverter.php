@@ -2,11 +2,11 @@
 
 namespace MadArlan\PDFBridge\Converters;
 
-use Mpdf\Mpdf;
-use Mpdf\MpdfException;
+use MadArlan\PDFBridge\Contracts\TextConverterInterface;
 use MadArlan\PDFBridge\Exceptions\ConversionException;
 use MadArlan\PDFBridge\Exceptions\ConverterNotAvailableException;
-use MadArlan\PDFBridge\Contracts\TextConverterInterface;
+use Mpdf\Mpdf;
+use Mpdf\MpdfException;
 
 /**
  * mPDF converter for HTML and text to PDF conversion
@@ -28,7 +28,7 @@ class MPDFConverter implements TextConverterInterface
      */
     protected function checkAvailability(): void
     {
-        if (!class_exists(Mpdf::class)) {
+        if (! class_exists(Mpdf::class)) {
             throw new ConverterNotAvailableException('mPDF', 'mPDF class not found. Please install mpdf/mpdf package.');
         }
     }
@@ -36,40 +36,32 @@ class MPDFConverter implements TextConverterInterface
     /**
      * Convert HTML to PDF
      *
-     * @param string $html
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     public function convertHTML(string $html, ?string $outputPath = null, array $options = []): string
     {
         try {
             $mpdf = $this->createMPDF($options);
-            
+
             // Set CSS if provided
-            if (!empty($options['css'])) {
+            if (! empty($options['css'])) {
                 $mpdf->WriteHTML($options['css'], \Mpdf\HTMLParserMode::HEADER_CSS);
             }
-            
+
             // Write HTML content
             $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
-            
+
             return $this->outputPDF($mpdf, $outputPath);
         } catch (MpdfException $e) {
-            throw new ConversionException("Failed to convert HTML to PDF: " . $e->getMessage(), 'mPDF', $e);
+            throw new ConversionException('Failed to convert HTML to PDF: '.$e->getMessage(), 'mPDF', $e);
         } catch (\Exception $e) {
-            throw new ConversionException("Failed to convert HTML to PDF: " . $e->getMessage(), 'mPDF', $e);
+            throw new ConversionException('Failed to convert HTML to PDF: '.$e->getMessage(), 'mPDF', $e);
         }
     }
 
     /**
      * Convert text to PDF
      *
-     * @param string $text
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     public function convertText(string $text, ?string $outputPath = null, array $options = []): string
@@ -77,38 +69,32 @@ class MPDFConverter implements TextConverterInterface
         try {
             // Convert text to HTML with basic formatting
             $html = $this->textToHTML($text, $options);
-            
+
             return $this->convertHTML($html, $outputPath, $options);
         } catch (\Exception $e) {
-            throw new ConversionException("Failed to convert text to PDF: " . $e->getMessage(), 'mPDF', $e);
+            throw new ConversionException('Failed to convert text to PDF: '.$e->getMessage(), 'mPDF', $e);
         }
     }
 
     /**
      * Convert CSV to PDF
      *
-     * @param string $csvContent
-     * @param string|null $outputPath
-     * @param array $options
-     * @return string
      * @throws ConversionException
      */
     public function convertCSV(string $csvContent, ?string $outputPath = null, array $options = []): string
     {
         try {
             $html = $this->csvToHTML($csvContent, $options);
-            
+
             return $this->convertHTML($html, $outputPath, $options);
         } catch (\Exception $e) {
-            throw new ConversionException("Failed to convert CSV to PDF: " . $e->getMessage(), 'mPDF', $e);
+            throw new ConversionException('Failed to convert CSV to PDF: '.$e->getMessage(), 'mPDF', $e);
         }
     }
 
     /**
      * Create mPDF instance with configuration
      *
-     * @param array $options
-     * @return Mpdf
      * @throws MpdfException
      */
     protected function createMPDF(array $options = []): Mpdf
@@ -128,11 +114,11 @@ class MPDFConverter implements TextConverterInterface
         ];
 
         // Add advanced options if available
-        if (!empty($this->config['tempDir'])) {
+        if (! empty($this->config['tempDir'])) {
             $config['tempDir'] = $this->config['tempDir'];
         }
-        
-        if (!empty($this->config['fontDir'])) {
+
+        if (! empty($this->config['fontDir'])) {
             $config['fontDir'] = $this->config['fontDir'];
         }
 
@@ -146,11 +132,11 @@ class MPDFConverter implements TextConverterInterface
         $mpdf->SetKeywords($options['keywords'] ?? '');
 
         // Set header and footer if provided
-        if (!empty($options['header'])) {
+        if (! empty($options['header'])) {
             $mpdf->SetHTMLHeader($options['header']);
         }
-        
-        if (!empty($options['footer'])) {
+
+        if (! empty($options['footer'])) {
             $mpdf->SetHTMLFooter($options['footer']);
         }
 
@@ -159,22 +145,18 @@ class MPDFConverter implements TextConverterInterface
 
     /**
      * Convert plain text to HTML with basic formatting
-     *
-     * @param string $text
-     * @param array $options
-     * @return string
      */
     protected function textToHTML(string $text, array $options = []): string
     {
         $fontSize = $options['font_size'] ?? $this->config['default_font_size'] ?? 12;
         $fontFamily = $options['font_family'] ?? $this->config['default_font'] ?? 'dejavusans';
-        
+
         // Escape HTML entities
         $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-        
+
         // Convert line breaks to HTML
         $text = nl2br($text);
-        
+
         // Wrap in basic HTML structure
         $html = "<!DOCTYPE html>
 <html>
@@ -198,10 +180,6 @@ class MPDFConverter implements TextConverterInterface
 
     /**
      * Convert CSV to HTML table
-     *
-     * @param string $csvContent
-     * @param array $options
-     * @return string
      */
     protected function csvToHTML(string $csvContent, array $options = []): string
     {
@@ -209,33 +187,35 @@ class MPDFConverter implements TextConverterInterface
         $hasHeader = $options['csv_has_header'] ?? true;
         $fontSize = $options['font_size'] ?? $this->config['default_font_size'] ?? 12;
         $fontFamily = $options['font_family'] ?? $this->config['default_font'] ?? 'dejavusans';
-        
+
         $lines = str_getcsv($csvContent, "\n");
         $tableRows = [];
         $isFirstRow = true;
-        
+
         foreach ($lines as $line) {
-            if (empty(trim($line))) continue;
-            
+            if (empty(trim($line))) {
+                continue;
+            }
+
             $fields = str_getcsv($line, $delimiter);
             $cells = [];
-            
+
             foreach ($fields as $field) {
                 $field = htmlspecialchars($field, ENT_QUOTES, 'UTF-8');
-                
+
                 if ($hasHeader && $isFirstRow) {
                     $cells[] = "<th style='background-color: #f0f0f0; font-weight: bold; padding: 8px; border: 1px solid #ccc;'>{$field}</th>";
                 } else {
                     $cells[] = "<td style='padding: 6px; border: 1px solid #ccc;'>{$field}</td>";
                 }
             }
-            
-            $tableRows[] = "<tr>" . implode('', $cells) . "</tr>";
+
+            $tableRows[] = '<tr>'.implode('', $cells).'</tr>';
             $isFirstRow = false;
         }
-        
+
         $tableContent = implode("\n", $tableRows);
-        
+
         $html = "<!DOCTYPE html>
 <html>
 <head>
@@ -269,9 +249,6 @@ class MPDFConverter implements TextConverterInterface
     /**
      * Output PDF to file or return as string
      *
-     * @param Mpdf $mpdf
-     * @param string|null $outputPath
-     * @return string
      * @throws MpdfException
      */
     protected function outputPDF(Mpdf $mpdf, ?string $outputPath = null): string
@@ -279,11 +256,12 @@ class MPDFConverter implements TextConverterInterface
         if ($outputPath) {
             // Ensure directory exists
             $directory = dirname($outputPath);
-            if (!is_dir($directory)) {
+            if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
+
             $mpdf->Output($outputPath, \Mpdf\Output\Destination::FILE);
+
             return $outputPath;
         }
 
@@ -292,8 +270,6 @@ class MPDFConverter implements TextConverterInterface
 
     /**
      * Get supported formats
-     *
-     * @return array
      */
     public function getSupportedFormats(): array
     {
@@ -302,13 +278,12 @@ class MPDFConverter implements TextConverterInterface
 
     /**
      * Check if converter is available
-     *
-     * @return bool
      */
     public function isAvailable(): bool
     {
         try {
             $this->checkAvailability();
+
             return true;
         } catch (ConverterNotAvailableException $e) {
             return false;
@@ -317,8 +292,6 @@ class MPDFConverter implements TextConverterInterface
 
     /**
      * Get converter version
-     *
-     * @return string|null
      */
     public function getVersion(): ?string
     {
@@ -329,7 +302,7 @@ class MPDFConverter implements TextConverterInterface
         } catch (\Exception $e) {
             // Ignore
         }
-        
+
         return null;
     }
 }
